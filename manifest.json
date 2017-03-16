@@ -1,0 +1,33 @@
+{  
+  "name": "HP Link tool",
+  "short_name": "HP Link tool",
+  "description": "This tool will help web editors to ease check/report of webpages from HP",
+  "version": "1.0",
+
+  "permissions": [
+    "webNavigation",
+    "notifications",
+    "activeTab",
+    "tabs"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["jquery_3.min.js", "tridion_ext.js", "popup.js"],
+      "run_at" : "document_idle"
+    }
+  ],
+
+  "background": {
+    "scripts": [ "background.js"],
+    "persistent": false
+  },
+
+  "browser_action": {
+    "default_icon": "hpi-hp-logo-pr.ico",
+    "default_title": "Hello !"
+  },
+
+  "manifest_version": 2
+}
