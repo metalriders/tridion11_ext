@@ -13,7 +13,7 @@
 
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": ["https://epocms.www8.hp.com/*"],
       "js": ["jquery_3.min.js", "tridion_ext.js", "popup.js"],
       "run_at" : "document_idle"
     }
