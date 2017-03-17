@@ -1,11 +1,12 @@
 console.log("Loading Tridion Extension");
 
+var callback;
 var filters =
 {
 	url: 
 	[
-		{hostSuffix:"epocms.www8.hp.com"},
-		{pathSuffix:"TridionDashboard.aspx"}
+		//{hostSuffix:"epocms.www8.hp.com"}
+		{pathContains:"ListFilters/SearchListBar.aspx"}
 	]
 };
 
@@ -15,26 +16,35 @@ var filters =
 // 	});
 // }); 
 
-chrome.webNavigation.onCompleted.addListener(function(tab) {
-	console.debug('webNavigation completed');
-  	console.log(tab);
-	
-	// chrome.tabs.executeScript(tab.tabId, {"file":'popup.js'}, function (){
-	// 	console.debug("Executed Script");
-	// });
+// UTILS
+function msg_log(str)
+{
+	console.info(str);
+}
 
 
-	var hey = "hola";
+/*
+	Listen to load of Tridion Dashboard and inject the extension
+*/
+callback = function(tab) {
+	var details;
+	console.debug('Loading Tridion Extension');
 
-	chrome.tabs.sendMessage(tab.tabId, {"var": hey}, function (){
-		console.debug("Sent Message");
+	details = {file:"jquery_3.min.js", runAt: "document_end"};
+	chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded jquery_3"));
+
+	details = {file:"popup.js", runAt:"document_end"};
+	chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded tridion_ext"));
+
+	chrome.tabs.sendMessage(tab.tabId, {"action": "dashboard_load"}, function (){
+		console.debug("Finished load of tridion!");
 	});
+}
+chrome.webNavigation.onCompleted.addListener(callback, filters);
 
-}, filters);
-
-
-//GetList to update List of items
-
+/*
+	Click listener for extension button
+*/
 chrome.browserAction.onClicked.addListener(function(tab) {
   // No tabs or host permissions needed!
   console.log('browserAction');
@@ -42,3 +52,4 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     code: 'document.body.style.backgroundColor="red"'
   });
 });
+callback = null;

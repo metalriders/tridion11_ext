@@ -96,3 +96,4 @@ class Tridion_Ext
     this.items = this.frame_items.contentWindow.document.querySelector("table");
   }
 };
+new Tridion_Ext();

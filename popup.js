@@ -1,21 +1,14 @@
 // Author: Daniel G (oscar-daniel.gonzalez@hp.com)
 
-chrome.runtime.onMessage.addListener(function(message)
+// Reserved for comms
+chrome.runtime.onMessage.addListener(function(msg)
 {
   console.info("Yo I got a message!");
-  console.debug(message);
-  
-  switch(message)
-  {
-    case "list": 
-      break;
-    default: 
-      break;
-  }
+  console.debug(msg);
 });
 
-document.onreadystatechange = function () {
-  if (document.readyState === "complete") {
-    new Tridion_Ext(); 
-  }
-}
+// Inject tridion_ext into page
+var scr = document.createElement('script');
+scr.type="text/javascript";
+scr.src= chrome.extension.getURL('tridion_ext.js');;
+document.head.appendChild(scr);
