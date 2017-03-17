@@ -11,8 +11,6 @@ chrome.webNavigation.onCompleted.addListener(
 		var details = {runAt: "document_end"};
 		console.debug('Loading Tridion Extension');
 
-		details["file"] = "jquery_3.min.js";
-		chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded jquery_3"));
 
 		details["file"] = "popup.js";
 		chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded tridion_ext"));
