@@ -1,25 +1,28 @@
-class Tridion_Ext
-{
+new class Tridion_Ext
+{  
   constructor()
   {
     this._v = 1.0;
     this.dashboard = document.querySelector("#DashboardContextMenu");
-    this.frame_items = undefined;
+    this.dashboard_list = document.querySelector("#FilteredDashboardList");
+    this.list_items = undefined;
     this.items = undefined;
 
-    this.log_init();
-
-    // Separate new actions
-    var sep = document.createElement("li");
-    sep.className = "separator";
-    this.dashboard.appendChild(sep);
-
-    this.enable_pro_publishing();
-    this.enable_open_mult_items();
+    this.init();
   }
 
+  observer_wrapper(target, config, callback)
+  {
+    var observer = new MutationObserver(callback);
+    observer.observe(target, config);
+    return function removeElementChange() {
+        observer.disconnect();
+    };
+  }
+  
   enable_pro_publishing()
   {
+    var _self = this;
     this.pro_publishing = document.createElement("li");
     this.pro_publishing.className  = "item Publish";
     this.pro_publishing.id = "improved_sel_publish";
@@ -49,7 +52,7 @@ class Tridion_Ext
 
   enable_open_mult_items()
   {
-    var self = this;
+    var _self = this;
     this.mult_open = document.createElement("li");
     this.mult_open.className  = "item Open";
     this.mult_open.id = "open_mult_items";
@@ -72,7 +75,7 @@ class Tridion_Ext
 
     this.mult_open.onclick = function()
     {
-      var sel = self.items.querySelectorAll("tr.selected");     // check dependency
+      var sel = _self.items.querySelectorAll("tr.selected");     // check dependency
       // Tridion does not support double click trigger on folders
       console.log("Do magic");
     }
@@ -82,12 +85,34 @@ class Tridion_Ext
 
   get_localStorage()
   {
-
   }
 
-  log_init()
+  init()
   {
+    var _self = this;
     console.debug("Tridion Extension v"+ this._v +", made by Daniel G [oscar-daniel.gonzalez@hp.com]");
+    
+    // Separate new actions
+    var sep = document.createElement("li");
+    sep.className = "separator";
+    this.dashboard.appendChild(sep);
+
+    this.observer_wrapper(
+      this.dashboard_list, { subtree: true, childList: true},function()
+      {
+        _self.list_items = document.querySelector("#FilteredItemsList_frame_details");
+        if(_self.list_items != null)
+        {
+          _self.list_items.addEventListener("load",function() 
+          {
+            if(this.contentWindow.document.body.innerText == "") return;
+            _self.update_frame_items();
+          });
+          this.disconnect();
+        }
+      });
+    this.enable_pro_publishing();
+    this.enable_open_mult_items();
   }
 
   update_frame_items()
@@ -96,4 +121,3 @@ class Tridion_Ext
     this.items = this.frame_items.contentWindow.document.querySelector("table");
   }
 };
-new Tridion_Ext();
