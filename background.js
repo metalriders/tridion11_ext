@@ -6,7 +6,7 @@ console.log("Loading Tridion Extension");
 	Listen to load of Tridion Dashboard and inject the extension
 */
 chrome.webNavigation.onCompleted.addListener(
-	function()
+	function(tab)
 	{
 		var details = {runAt: "document_end"};
 		console.debug('Loading Tridion Extension');
