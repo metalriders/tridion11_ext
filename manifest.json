@@ -16,14 +16,7 @@
   "web_accessible_resources": [
     "tridion_ext.js"
   ],
-  // "content_scripts": [
-  //   {
-  //     "matches": ["https://epocms.www8.hp.com/*"],
-  //     "js": ["jquery_3.min.js", "tridion_ext.js", "popup.js"],
-  //     "run_at" : "document_idle"
-  //   }
-  // ],
-
+  
   "background": {
     "scripts": [ "background.js"],
     "persistent": true
