@@ -102,27 +102,10 @@ new class Tridion_Ext
   enable_open_mult_items()
   {
     var _self = this;
-    this.mult_open = document.createElement("li");
-    this.mult_open.className  = "item Open";
-    this.mult_open.id = "open_mult_items";
+    var listeners = [];
+    var callback;
 
-    var mult_open_div = document.createElement("div");
-    mult_open_div.className = "image";
-    mult_open_div.setAttribute("unselectable", "on");
-
-    var mult_open_span = document.createElement("span");
-    mult_open_span.innerHTML = "Open selected items";
-    
-    this.mult_open.appendChild(mult_open_div);
-    this.mult_open.appendChild(mult_open_span);
-
-
-    this.mult_open.onmouseover = function() 
-    {
-      Tridion.Controls.ContextMenu.prototype._hightlightItem(this)
-    };
-
-    this.mult_open.onclick = function()
+    callback = function()
     {
       _self.update_frame_items();              // quick fix for
       if(_self.items.length == 0) return;
@@ -144,7 +127,9 @@ new class Tridion_Ext
         });
       // Tridion does not support double click trigger on folder      
     }
+    listeners.push({ "type": "click", "callback" : callback });
 
+    this.mult_open = new DashboardFeature(features.open_items, listeners);
     this.ctx_menu.appendChild(this.mult_open);
   }
 
