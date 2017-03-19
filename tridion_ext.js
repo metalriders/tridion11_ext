@@ -34,6 +34,10 @@ class DashboardFeature
     
     this.element.appendChild(element_div);
     this.element.appendChild(element_span);
+    
+    this.element.addEventListener("mouseover",function(){        
+        Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
+      });
 
     listeners.forEach(function(listener) {
       _self.element.addEventListener(listener.type, listener.callback);
@@ -83,14 +87,8 @@ new class Tridion_Ext
 /* Actions*/
   enable_publish_items()
   {
-    var _self = this;
     var listeners = [];
     var callback;
-    
-    callback = function() { 
-      Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
-    };
-    listeners.push({ "type": "mouseover", "callback" : callback });
 
     callback = function(){
       console.log("Publishing items");
