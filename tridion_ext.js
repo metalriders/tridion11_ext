@@ -52,7 +52,7 @@ new class Tridion_Ext
   constructor()
   {
     this._v = 1.0;
-    this.ctx_menu = document.querySelector("#DashboardContextMenu");
+    this.dashboard_menu = document.querySelector("#DashboardContextMenu");
     this.dashboard_tree = document.querySelector("#DashboardTree iframe");
     this.dashboard_list = document.querySelector("#FilteredDashboardList");
     this.publications_refs = [];
@@ -154,7 +154,7 @@ new class Tridion_Ext
   feature_wr(element, feature, listeners)
   {
     element = new DashboardFeature(feature, listeners);
-    this.ctx_menu.appendChild(element);
+    this.dashboard_menu.appendChild(element);
   }
 
 /* Main Functions */
@@ -162,7 +162,7 @@ new class Tridion_Ext
   {
     var sep = document.createElement("li");
     sep.className = "separator";
-    this.ctx_menu.appendChild(sep);
+    this.dashboard_menu.appendChild(sep);
 
     this.enable_publish_items();
     this.enable_open_mult_items();
