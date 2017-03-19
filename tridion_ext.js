@@ -94,9 +94,7 @@ new class Tridion_Ext
       console.log("Publishing items");
     }    
     listeners.push({ "type": "click", "callback" : callback });
-
-    this.pro_publishing = new DashboardFeature(features.publish_items, listeners);
-    this.ctx_menu.appendChild(this.pro_publishing);
+    this.feature_wr(this.pro_publishing, feature.publish_items, listeners);
   }
 
   enable_open_mult_items()
@@ -128,9 +126,7 @@ new class Tridion_Ext
       // Tridion does not support double click trigger on folder      
     }
     listeners.push({ "type": "click", "callback" : callback });
-
-    this.mult_open = new DashboardFeature(features.open_items, listeners);
-    this.ctx_menu.appendChild(this.mult_open);
+    this.feature_wr(this.mult_open, feature.open_items, listeners);
   }
 
 /* Storage */
