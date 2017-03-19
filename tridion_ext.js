@@ -155,6 +155,12 @@ new class Tridion_Ext
     };
   }
 
+  feature_wr(element, feature, listeners)
+  {
+    element = new DashboardFeature(feature, listeners);
+    this.ctx_menu.appendChild(element);
+  }
+
 /* Main Functions */
   add_actions()
   {
