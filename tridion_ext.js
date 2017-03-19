@@ -93,6 +93,7 @@ new class Tridion_Ext
 
     this.mult_open.onclick = function()
     {
+      this.update_frame_items();              // quick fix for
       if(_self.items.length == 0) return;
       var sel_items = _self.items.querySelectorAll("tr.selected");
       
@@ -107,10 +108,9 @@ new class Tridion_Ext
           }
           else        // everything else
           {
-            console.log("Type not supported");
+            console.error("Type not supported yet :P");
           }
         });
-      // Example of url for items https://epocms.www8.hp.com/WebUI/item.aspx?tcm=16#id=tcm:50-1719412
       // Tridion does not support double click trigger on folder      
     }
 
@@ -199,5 +199,4 @@ new class Tridion_Ext
     }
     return out;
   }
-  
 };
