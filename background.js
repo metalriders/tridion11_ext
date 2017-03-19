@@ -1,44 +1,45 @@
+// Author: Daniel G (oscar-daniel.gonzalez@hp.com)
+
 console.log("Loading Tridion Extension");
+/*
+	Listen to load of Tridion Dashboard and inject the extension
+*/
+chrome.webNavigation.onCompleted.addListener(
+	function(tab)
+	{
+		console.debug('Loading Tridion Extension');
 
-var filters =
-{
-	url: 
-	[
-		{hostSuffix:"epocms.www8.hp.com"},
-		{pathSuffix:"TridionDashboard.aspx"}
-	]
-};
+		var details = {runAt: "document_end"};
+		details["file"] = "popup.js";
+		chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded tridion_ext"));
+	}
+	// URLfilter
+	, {url:[{pathContains:"ListFilters/SearchListBar.aspx"}]}		
+);
 
-// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-// 	chrome.tabs.executeScript(tab.tabId, {"code":'console.log("hello world from the other side")'}, function (){
-// 		console.log("Executed Script 2");
-// 	});
-// }); 
-
-chrome.webNavigation.onCompleted.addListener(function(tab) {
-	console.debug('webNavigation completed');
-  	console.log(tab);
-	
-	// chrome.tabs.executeScript(tab.tabId, {"file":'popup.js'}, function (){
-	// 	console.debug("Executed Script");
-	// });
-
-
-	var hey = "hola";
-
-	chrome.tabs.sendMessage(tab.tabId, {"var": hey}, function (){
-		console.debug("Sent Message");
-	});
-
-}, filters);
-
-
-//GetList to update List of items
-
+/*
+	Click listener for extension button
+*/
 chrome.browserAction.onClicked.addListener(function(tab) {
-  // No tabs or host permissions needed!
-  console.log('browserAction');
-  chrome.tabs.executeScript({
-    code: 'document.body.style.backgroundColor="red"'
-  });
+	// No tabs or host permissions needed!
+	console.log('browserAction');
+	chrome.tabs.executeScript({
+		code: 'document.body.style.backgroundColor="red"'
+	});
 });
+
+/*
+	Handle messages from page
+*/
+chrome.runtime.onMessage.addListener(function(msg)
+{
+	console.debug("Background - Yo I got a message!");
+	console.info(msg);
+	chrome.tabs.create({ url: msg.url, active: false});
+});
+
+// UTILS
+function msg_log(str)
+{
+  	console.info(str);
+}
