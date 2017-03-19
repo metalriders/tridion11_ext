@@ -16,7 +16,7 @@ var features =
   }
 };
 
-class DashboardFeature
+class DashboardMenuFeature
 {
   constructor(feature, listeners)
   {
@@ -153,7 +153,7 @@ new class Tridion_Ext
 
   feature_wr(element, feature, listeners)
   {
-    element = new DashboardFeature(feature, listeners);
+    element = new DashboardMenuFeature(feature, listeners);
     this.dashboard_menu.appendChild(element);
   }
 
