@@ -103,7 +103,7 @@ new class Tridion_Ext
           if(item.type == 16)  // component
           {
             console.log("Opening tcm"+ item.tcm_id + " from " + _self.lvls[item.lvl]);
-            var url_base = "https://epocms.www8.hp.com/WebUI/item.aspx?tcm=16#id=tcm:"+item.lvl+"-"+item.tcm_id;
+            var url_base = docuemnt.location.origin +"/WebUI/item.aspx?tcm=16#id=tcm:"+item.lvl+"-"+item.tcm_id;
             window.postMessage({action: "open_item", url: url_base}, "*");    // send a message to background to handle request
           }
           else        // everything else
