@@ -93,7 +93,7 @@ new class Tridion_Ext
 
     this.mult_open.onclick = function()
     {
-      this.update_frame_items();              // quick fix for
+      _self.update_frame_items();              // quick fix for
       if(_self.items.length == 0) return;
       var sel_items = _self.items.querySelectorAll("tr.selected");
       
