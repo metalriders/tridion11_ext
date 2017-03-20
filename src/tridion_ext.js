@@ -38,6 +38,10 @@ class DashboardMenuFeature
     this.element.addEventListener("mouseover",function(){        
         Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
       });
+    this.element.addEventListener("click",function(){
+        // Close DashboardMenu after clicking the feature
+        //Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
+      });
 
     listeners.forEach(function(listener) {
       _self.element.addEventListener(listener.type, listener.callback);
