@@ -1,7 +1,7 @@
 {  
-  "name": "HP Link tool",
-  "short_name": "HP Link tool",
-  "description": "This tool will help web editors to ease check/report of webpages from HP",
+  "name": "Tridion11 extension",
+  "short_name": "trid11_ext",
+  "description": "This tool will help web editors to ease usage of tridion 2011",
   "version": "1.0",
 
   "permissions": [
