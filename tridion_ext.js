@@ -11,7 +11,7 @@ var features =
   publish_items:
   {
     id: "publihs_mult_items",
-    class:"item Publish", 
+    class:"item Publish disabled", 
     title: "Publish selected items"
   }
 };
