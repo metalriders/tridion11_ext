@@ -1,11 +1,58 @@
 // Author: Daniel G (oscar-daniel.gonzalez@hp.com)
 
+var features = 
+{
+  open_items: 
+  {
+    id: "open_mult_items",
+    class:"item Open", 
+    title: "Open selected items"
+  },
+  publish_items:
+  {
+    id: "publihs_mult_items",
+    class:"item Publish disabled", 
+    title: "Publish selected items"
+  }
+};
+
+class DashboardMenuFeature
+{
+  constructor(feature, listeners)
+  {
+    var _self = this;
+    this.element = document.createElement("li");
+    this.element.className  = feature.class;
+    this.element.id = feature.id;
+
+    var element_div = document.createElement("div");
+    element_div.className = "image";
+    element_div.setAttribute("unselectable", "on");
+
+    var element_span = document.createElement("span");
+    element_span.innerHTML = feature.title;
+    
+    this.element.appendChild(element_div);
+    this.element.appendChild(element_span);
+    
+    this.element.addEventListener("mouseover",function(){        
+        Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
+      });
+
+    listeners.forEach(function(listener) {
+      _self.element.addEventListener(listener.type, listener.callback);
+    });
+
+    return this.element;
+  }
+}
+
 new class Tridion_Ext
 {  
   constructor()
   {
     this._v = 1.0;
-    this.ctx_menu = document.querySelector("#DashboardContextMenu");
+    this.dashboard_menu = document.querySelector("#DashboardContextMenu");
     this.dashboard_tree = document.querySelector("#DashboardTree iframe");
     this.dashboard_list = document.querySelector("#FilteredDashboardList");
     this.publications_refs = [];
@@ -38,60 +85,25 @@ new class Tridion_Ext
   }
   
 /* Actions*/
-  enable_pro_publishing()
+  enable_publish_items()
   {
-    var _self = this;
-    this.pro_publishing = document.createElement("li");
-    this.pro_publishing.className  = "item Publish";
-    this.pro_publishing.id = "improved_sel_publish";
+    var listeners = [];
+    var callback;
 
-    var pro_publishing_div = document.createElement("div");
-    pro_publishing_div.className = "image";
-    pro_publishing_div.setAttribute("unselectable", "on");
-
-    var pro_publishing_span = document.createElement("span");
-    pro_publishing_span.innerHTML = "Automated Publishing";
-    
-    this.pro_publishing.appendChild(pro_publishing_div);
-    this.pro_publishing.appendChild(pro_publishing_span);
-
-    this.pro_publishing.onmouseover = function() 
-    {
-      Tridion.Controls.ContextMenu.prototype._hightlightItem(this)
-    };
-
-    this.pro_publishing.onclick = function()
-    {
+    callback = function(){
       console.log("Publishing items");
     }    
-
-    this.ctx_menu.appendChild(this.pro_publishing);
+    listeners.push({ "type": "click", "callback" : callback });
+    this.feature_wr(this.pro_publishing, features.publish_items, listeners);
   }
 
   enable_open_mult_items()
   {
     var _self = this;
-    this.mult_open = document.createElement("li");
-    this.mult_open.className  = "item Open";
-    this.mult_open.id = "open_mult_items";
+    var listeners = [];
+    var callback;
 
-    var mult_open_div = document.createElement("div");
-    mult_open_div.className = "image";
-    mult_open_div.setAttribute("unselectable", "on");
-
-    var mult_open_span = document.createElement("span");
-    mult_open_span.innerHTML = "Open selected items";
-    
-    this.mult_open.appendChild(mult_open_div);
-    this.mult_open.appendChild(mult_open_span);
-
-
-    this.mult_open.onmouseover = function() 
-    {
-      Tridion.Controls.ContextMenu.prototype._hightlightItem(this)
-    };
-
-    this.mult_open.onclick = function()
+    callback = function()
     {
       _self.update_frame_items();              // quick fix for
       if(_self.items.length == 0) return;
@@ -103,7 +115,7 @@ new class Tridion_Ext
           if(item.type == 16)  // component
           {
             console.log("Opening tcm"+ item.tcm_id + " from " + _self.lvls[item.lvl]);
-            var url_base = "https://epocms.www8.hp.com/WebUI/item.aspx?tcm=16#id=tcm:"+item.lvl+"-"+item.tcm_id;
+            var url_base = document.location.origin +"/WebUI/item.aspx?tcm=16#id=tcm:"+item.lvl+"-"+item.tcm_id;
             window.postMessage({action: "open_item", url: url_base}, "*");    // send a message to background to handle request
           }
           else        // everything else
@@ -113,8 +125,8 @@ new class Tridion_Ext
         });
       // Tridion does not support double click trigger on folder      
     }
-
-    this.ctx_menu.appendChild(this.mult_open);
+    listeners.push({ "type": "click", "callback" : callback });
+    this.feature_wr(this.mult_open, features.open_items, listeners);
   }
 
 /* Storage */
@@ -139,14 +151,20 @@ new class Tridion_Ext
     };
   }
 
+  feature_wr(element, feature, listeners)
+  {
+    element = new DashboardMenuFeature(feature, listeners);
+    this.dashboard_menu.appendChild(element);
+  }
+
 /* Main Functions */
   add_actions()
   {
     var sep = document.createElement("li");
     sep.className = "separator";
-    this.ctx_menu.appendChild(sep);
+    this.dashboard_menu.appendChild(sep);
 
-    this.enable_pro_publishing();
+    this.enable_publish_items();
     this.enable_open_mult_items();
   }
 
