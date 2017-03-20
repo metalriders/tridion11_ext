@@ -76,7 +76,7 @@ new class Tridion_Ext
         {
           var id = publication.id.split(':')[1].split('-')[1];
           var lvl = publication.querySelector(".header .title").title;
-          lvl = lvl.slice(0, lvl.indexOf(" ("));  // lvl   remove what is between parenthesis
+          lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
           _self.lvls[id] = unescape(lvl);
         });
     
