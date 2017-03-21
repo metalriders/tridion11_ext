@@ -201,9 +201,12 @@ new class Tridion_Ext
         var cols = row.querySelectorAll("td");
         var item_lvl = cols[3].querySelector("div");
         var txt_lvl = _self.unicode_to_ascii(item_lvl.innerText);
+
         row.tcm_id = row.id.split(':')[1].split('-')[1];
         row.type = cols[2].getAttribute("value");
-        row.lvl = _self.get_id_by_lvl(txt_lvl);  
+        
+        row.lvl = (txt_lvl == "" || txt_lvl == "(Local copy)")? 
+          row.id.split(':')[1].split('-')[0] : _self.get_id_by_lvl(txt_lvl);
       });
   }
 
