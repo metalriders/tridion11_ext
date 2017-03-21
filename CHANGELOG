@@ -1,10 +1,8 @@
-v0.0.1
+Released v0.0.1 - March 17, 2017
+    - [Feature] Added open multiple items 
 
-  Features
-    - Added open multiple items
+Released v0.0.2 - March 19, 2017
+    - [Bug] Fixed retrieve of level name
 
-
-v0.0.2
-
-  Fixs
-    - Correct retrieve of level name
+WIP v0.0.3 - TBD
+    - [Bug] Fixed wrong lvl id setup for localized and root items
