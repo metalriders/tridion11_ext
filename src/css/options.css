@@ -1,3 +1,14 @@
-    html, body{
-        background-color: #86c9f7;
-    }
+html, body{
+	background-color: #86c9f7;
+}
+
+#main{
+	width: 90em;
+}
+
+section{
+	background: rgba(255, 255, 255, 0.9);
+	box-shadow: 0px 1px 4px 0px rgba(85, 98, 112, 0.5);
+  padding: 3em;
+  margin: 4em 0;
+}
