@@ -9,17 +9,18 @@
     "webRequest",
     "notifications",
     "activeTab",
-    "tabs"
+    "tabs",
+    "<all_urls>"
   ],
 
   "options_page": "options.html",
 
   "web_accessible_resources": [
-    "tridion_ext.js"
+    "js/tridion_ext.js"
   ],
   
   "background": {
-    "scripts": [ "background.js"],
+    "scripts": [ "js/background.js"],
     "persistent": true
   },
 

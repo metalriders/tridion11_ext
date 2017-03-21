@@ -1,6 +1,7 @@
 // Author: Daniel G (oscar-daniel.gonzalez@hp.com)
 
 console.log("Loading Tridion Extension");
+
 /*
 	Listen to load of Tridion Dashboard and inject the extension
 */
@@ -10,7 +11,7 @@ chrome.webNavigation.onCompleted.addListener(
 		console.debug('Loading Tridion Extension');
 
 		var details = {runAt: "document_end"};
-		details["file"] = "popup.js";
+		details["file"] = "js/popup.js";
 		chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded tridion_ext"));
 	}
 	// URLfilter

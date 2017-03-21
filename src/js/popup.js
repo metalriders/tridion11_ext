@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(msg)
 // Inject tridion_ext into page
 var scr = document.createElement('script');
 scr.type="text/javascript";
-scr.src= chrome.extension.getURL('tridion_ext.js');;
+scr.src= chrome.extension.getURL('js/tridion_ext.js');;
 document.head.appendChild(scr);
 
 window.addEventListener("message", function(event) {
