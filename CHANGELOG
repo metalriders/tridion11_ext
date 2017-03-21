@@ -8,3 +8,4 @@ Released v0.0.2 - March 19, 2017
 
 WIP v0.0.3 - TBD
   - [Bug] Fixed wrong lvl id setup for localized and root items
+  - [Bug] Removed red change on page when clicking extension button
