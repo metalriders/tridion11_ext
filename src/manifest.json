@@ -2,7 +2,7 @@
   "name": "Tridion11 extension",
   "short_name": "trid11_ext",
   "description": "This tool will help web editors to ease usage of tridion 2011",
-  "version": "0.0.2",
+  "version": "0.0.3",
 
   "permissions": [
     "webNavigation",
@@ -13,7 +13,7 @@
     "<all_urls>"
   ],
 
-  "options_page": "options.html",
+  "options_page": "polymer/index.html",
 
   "web_accessible_resources": [
     "js/tridion_ext.js"
@@ -25,7 +25,7 @@
   },
 
   "browser_action": {
-    "default_icon": "icon.ico",
+    "default_icon": "images/icon.ico",
     "default_title": "This icon does nothing !"
   },
 
