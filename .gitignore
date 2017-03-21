@@ -2,4 +2,4 @@
 .vscode/
 
 # hide no-vulcanized polymer components
-polymer/
+src/polymer/
