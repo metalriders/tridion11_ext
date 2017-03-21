@@ -1,0 +1,5 @@
+# default directory used by the VScode
+.vscode/
+
+# hide no-vulcanized polymer components
+polymer/
