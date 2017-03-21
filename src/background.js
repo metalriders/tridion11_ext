@@ -23,9 +23,9 @@ chrome.webNavigation.onCompleted.addListener(
 chrome.browserAction.onClicked.addListener(function(tab) {
 	// No tabs or host permissions needed!
 	console.log('browserAction');
-	chrome.tabs.executeScript({
-		code: 'document.body.style.backgroundColor="red"'
-	});
+	// chrome.tabs.executeScript({
+	// 	code: 'document.body.style.backgroundColor="red"'
+	// });
 });
 
 /*

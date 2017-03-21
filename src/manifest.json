@@ -9,8 +9,7 @@
     "webRequest",
     "notifications",
     "activeTab",
-    "tabs",
-    "<all_urls>"
+    "tabs"
   ],
 
   "options_page": "options.html",
