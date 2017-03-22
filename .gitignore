@@ -1,5 +1,12 @@
 # default directory used by the VScode
 .vscode/
 
-# hide no-vulcanized polymer components
-src/polymer_dev/
+# polymer workspace
+src/bower_components/
+src/test
+src/src
+src/pol_manifest.json
+src/pol_index.html
+src/bower.json
+src/polymer.json
+src/README.md
