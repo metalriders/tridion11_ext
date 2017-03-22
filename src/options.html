@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html>
-<head><title>Tridion11Ext Options</title></head>
-<link rel="stylesheet" href="css/options.css" type="text/css">
+<head>
+	<title>Tridion11Ext Options</title>
+	<link rel="stylesheet" href="css/options.css" type="text/css">
+
+	<!--Polymer-->
+	<script src="polymer/bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+	<script src="polymer/bower_components/polymer/polymer.html"></script>
+	
+	<!--Custom elements-->
+	<link rel="import" href="polymer/custom_elements/ext-options.html">
+</head>
+
 <body>
-    <h1> Tridion11 extension Options </h1>
-    <div id=main>
-        <section>
+	<h1> Tridion11 extension Options </h1>
+	<ext-options></ext-options>
 
-        </section>
-    </div>
 
-    <div id="status"></div>
-    <button id="save">Save</button>
-
-    <script src="js/options.js"></script>
+	<div id="status"></div>
+	<button id="save">Save</button>
+	<script src="js/options.js"></script>
 </body>
 </html>
