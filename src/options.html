@@ -1,24 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Tridion11Ext Options</title>
-	<link rel="stylesheet" href="css/options.css" type="text/css">
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">-->
 
-	<!--Polymer-->
-	<script src="polymer_dev/webcomponentsjs/webcomponents-loader.js"></script>
-	<script src="polymer_dev/polymer/polymer.html"></script>
-	
-	<!--Custom elements-->
-	<link rel="import" href="polymer/custom_elements/ext-options.html">
-</head>
+    <title>options</title>
+    <meta name="description" content="options description">
+    <link rel="stylesheet" type="text/css" href="css/options.css">
+  </head>
+  <body> 
+    <h1> Tridion Levels</h1>
+    <div id="main">
+      <option-section name="All levels">
+      </option-section>
 
-<body>
-	<h1> Tridion11 extension Options </h1>
-	<ext-options></ext-options>
+      <option-section name="Custom batch" custom>
+      </option-section>
+    </div>  
 
-
-	<div id="status"></div>
-	<button id="save">Save</button>
-	<script src="js/options.js"></script>
-</body>
+    <div id="status"></div>
+    <button id="save">Save</button>
+    <script src="js/options.js"></script>
+  </body>
 </html>
