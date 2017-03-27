@@ -3,13 +3,21 @@ body{
 	margin: 0;
 }
 
-#main{
-	width: 30em;
+.options_section{
+	width: 75em;
 	margin: 0 auto;
 }
+.options_section h3{
+	width: 90%;
+	margin: 30px 0 0 0;
+}
 
+.add_custom{
+	float:left;
+	margin-right: 10px;
+}
 option-section{
-	display: inline-block;;
+	display: inline-block;
 	width: 90%;
 	background: rgba(255, 255, 255, 0.9);
 	box-shadow: 0px 1px 4px 0px rgba(85, 98, 112, 0.5);

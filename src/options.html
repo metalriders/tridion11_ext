@@ -9,14 +9,18 @@
     <link rel="stylesheet" type="text/css" href="css/options.css">
   </head>
   <body> 
-    <h1> Tridion Levels</h1>
-    <div id="main">
+    <h1>Tridion Levels</h1>
+    
+    <div id="main-section" class="options_section">
+      <h3>All levels</h3>
       <option-section name="All levels">
       </option-section>
+    </div>
 
-      <option-section name="Custom batch" custom>
-      </option-section>
-    </div>  
+    <div id="custom-sections" class="options_section">
+      <button class="add_custom">+</button>
+      <h3>Custom batches</h3>
+    </div>
 
     <div id="status"></div>
     <button id="save">Save</button>
