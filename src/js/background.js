@@ -36,7 +36,24 @@ chrome.runtime.onMessage.addListener(function(msg)
 {
 	console.debug("Background - Yo I got a message!");
 	console.info(msg);
-	chrome.tabs.create({ url: msg.url, active: false});
+
+	switch (msg.action) {
+		case 'init_levels':
+			chrome.storage.local.get("all_levels", function(obj){
+				if(obj == undefined){
+					chrome.storage.local.set({'all_levels': msg.data}, function() {
+						console.log('Settings saved');
+					});
+				}
+				console.log("Levels already defined");
+			})
+			break;
+		case 'open_item':
+			chrome.tabs.create({ url: msg.url, active: false});
+			break;
+		default:
+			break;
+	}	
 });
 
 // UTILS

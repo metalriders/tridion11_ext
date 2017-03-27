@@ -18,6 +18,6 @@ window.addEventListener("message", function(event) {
   if (event.source != window)
     return;
 
-  if (event.data.action && (event.data.action == "open_item"))    chrome.runtime.sendMessage(event.data);
+  if (event.data.action && (event.data.action == "open_item" || event.data.action == "init_levels"))    chrome.runtime.sendMessage(event.data);
 
 }, false);
