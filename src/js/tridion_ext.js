@@ -63,7 +63,7 @@ new class Tridion_Ext
     this.list_lvls = [];
     this.list_items = [];
     this.items = [];
-    this.lvls = [];
+    this.lvls = {};
 
     this.init();
   }
@@ -73,17 +73,19 @@ new class Tridion_Ext
     console.debug("Tridion Extension v"+ this._v +", made by Daniel G [oscar-daniel.gonzalez@hp.com]");
     var _self = this;
     
-      this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated div.children div.node");
-      
-      this.publications_refs
-        .forEach(function(publication) 
-        {
-          var id = publication.id.split(':')[1].split('-')[1];
-          var lvl = publication.querySelector(".header .title").title;
-          lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
-          _self.lvls[id] = unescape(lvl);
-        });
+    this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated div.children div.node");
     
+    this.publications_refs
+      .forEach(function(publication) 
+      {
+        var id = publication.id.split(':')[1].split('-')[1];
+        var lvl = publication.querySelector(".header .title").title;
+        lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
+        _self.lvls[unescape(lvl)] = id;
+      });
+
+    window.postMessage({action: "init_levels", data: this.lvls}, "*");
+
     this.add_actions();
     this.add_observers();
   }
@@ -118,7 +120,7 @@ new class Tridion_Ext
         {
           if(item.type == 16)  // component
           {
-            console.log("Opening tcm"+ item.tcm_id + " from " + _self.lvls[item.lvl]);
+            console.log("Opening tcm"+ item.tcm_id + " from lvl-id:" + item.lvl);
             var url_base = document.location.origin +"/WebUI/item.aspx?tcm=16#id=tcm:"+item.lvl+"-"+item.tcm_id;
             window.postMessage({action: "open_item", url: url_base}, "*");    // send a message to background to handle request
           }
@@ -206,14 +208,14 @@ new class Tridion_Ext
         row.type = cols[2].getAttribute("value");
         
         row.lvl = (txt_lvl == "" || txt_lvl == "(Local copy)")? 
-          row.id.split(':')[1].split('-')[0] : _self.get_id_by_lvl(txt_lvl);
+          row.id.split(':')[1].split('-')[0] : _self.lvls[txt_lvl];
       });
   }
 
 /* UTILS */  
-  get_id_by_lvl(lvl)
+  get_id_by_lvl(lvl)    // Deprecated
   {
-    return this.lvls.indexOf(lvl);
+    return this.lvls[lvl];
   }
 
   unicode_to_ascii(str)
