@@ -32,6 +32,7 @@ class OptionLevel extends HTMLElement{
     this.id = level.id;
     chkbx.type = "checkbox";
     chkbx.id = level.id;
+    chkbx.value = level.name;
     span.textContent = level.name;
     this.append(chkbx);
     this.append(span);
@@ -48,24 +49,47 @@ class OptionLevels extends HTMLElement{
   
   constructor(levels){
     super();
-    levels.forEach(this.addOption, this);
+    for(var level in levels) 
+    this.addOption({name:level, id:levels[level]});
     return this;
   }
 }
 customElements.define('option-levels', OptionLevels);
 
 class OptionsSection extends HTMLElement{
-  constructor(){
+  constructor(name, custom){
     super();
-    if(this.getAttribute("custom")){
+    
+    var title = document.createElement("h2");
+    title.textContent = this.getAttribute("name") || name || "Custom batch";
+    this.append(title);  
+
+    if(custom) {
       this.custom = true;
-    }
-    if(this.hasAttribute("name")){
-      var title = document.createElement("h2");
-      title.textContent = this.getAttribute("name");
-      this.append(title);
-    }
-    this.append(new OptionLevels([{name:"H", id:12},{name:"H", id:12},{name:"H", id:12},{name:"H", id:12},{name:"H", id:12},{name:"H", id:12},{name:"H", id:12},{name:"H", id:12},{name:"H", id:12}]));
+      var selected_levels = {};
+      document.querySelectorAll("#main-section input:checked").forEach(function(input){
+        selected_levels[input.value] = input.id;
+      });
+      this.appendChild(new OptionLevels(selected_levels));
+    }  
   }
 }
 customElements.define('option-section', OptionsSection);
+
+
+(function(){
+
+  var customs = document.querySelector("#custom-sections");
+  // Load personal settings
+  chrome.storage.local.get("all_levels", function(levels){
+    if(levels == undefined) return;
+    console.log("loading levels");
+    var all_lvl_container = document.querySelector("option-section");
+    all_lvl_container.appendChild(new OptionLevels(levels.all_levels));
+  });
+
+  document.querySelector(".add_custom").addEventListener("click", function(){
+    customs.appendChild(new OptionsSection("New Batch", true));
+  });
+
+})();
