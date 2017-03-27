@@ -7,6 +7,7 @@
   "permissions": [
     "webNavigation",
     "webRequest",
+    "storage",
     "notifications",
     "activeTab",
     "tabs",
