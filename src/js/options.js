@@ -29,7 +29,6 @@ class OptionLevel extends HTMLElement{
     
     var chkbx = document.createElement("input");
     var span = document.createElement("span");
-    this.id = level.id;
     chkbx.type = "checkbox";
     chkbx.id = level.id;
     chkbx.value = level.name;
@@ -50,7 +49,7 @@ class OptionLevels extends HTMLElement{
   constructor(levels){
     super();
     for(var level in levels) 
-    this.addOption({name:level, id:levels[level]});
+      this.addOption({name:level, id:levels[level]});
     return this;
   }
 }
@@ -85,7 +84,33 @@ customElements.define('option-section', OptionsSection);
     if(levels == undefined) return;
     console.log("loading levels");
     var all_lvl_container = document.querySelector("option-section");
-    all_lvl_container.appendChild(new OptionLevels(levels.all_levels));
+    var levels = new OptionLevels(levels.all_levels);
+    
+    
+    // input change listeners
+    levels.querySelectorAll("input").forEach(function(input) {
+      input.addEventListener("change", function () {
+        var id =input.id;
+        var added = false;
+        
+        if(this.checked)
+          document.querySelectorAll("#custom-sections option-levels").forEach(function(levels){
+
+            levels.querySelectorAll("input").forEach(function(section_input){
+              if(section_input.value > input.value && !added){
+                levels.inserBefore(new OptionLevel({id:input.id, name:input.value}), section_input.parentNode)
+                added = true;
+              }
+            });
+
+            if(!added) levels.appendChild( new OptionLevel({id:input.id, name:input.value}));
+          });
+        else
+          document.querySelector('#custom-sections input[id="'+input.id+'"]').parentNode.remove();
+      })
+    },this);
+
+    all_lvl_container.appendChild(levels);
   });
 
   document.querySelector(".add_custom").addEventListener("click", function(){
