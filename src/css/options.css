@@ -8,10 +8,14 @@ body{
 	top: 14px;
 	right: 18px;
 }
-
+.delete{
+	position: relative;
+	bottom: 41px;
+	left: 99%;
+}
 .options_section{
 	width: 75em;
-	margin: 0 auto;
+	margin: 30px auto;
 }
 .options_section h3{
 	width: 90%;

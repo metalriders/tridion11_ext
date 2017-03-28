@@ -69,6 +69,12 @@ class OptionsSection extends HTMLElement{
       document.querySelectorAll("#main-section input:checked").forEach(function(input){
         selected_levels[input.value] = input.id;
       });
+      var del = document.createElement("button");
+      del.className = "delete";
+      del.textContent = "x";
+      del.addEventListener("click", function(){this.parentNode.remove();});
+
+      this.appendChild(del);
       this.appendChild(new OptionLevels(selected_levels));
     }  
   }
@@ -91,11 +97,10 @@ customElements.define('option-section', OptionsSection);
     levels.querySelectorAll("input").forEach(function(input) {
       input.addEventListener("change", function () {
         var id =input.id;
-        var added = false;
         
         if(this.checked)
           document.querySelectorAll("#custom-sections option-levels").forEach(function(levels){
-
+            var added = false;
             levels.querySelectorAll("input").forEach(function(section_input){
               if(section_input.value > input.value && !added){
                 section_input.parentNode.insertAdjacentElement('beforebegin', new OptionLevel({id:input.id, name:input.value}))
