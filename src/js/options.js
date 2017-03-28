@@ -98,7 +98,7 @@ customElements.define('option-section', OptionsSection);
 
             levels.querySelectorAll("input").forEach(function(section_input){
               if(section_input.value > input.value && !added){
-                levels.inserBefore(new OptionLevel({id:input.id, name:input.value}), section_input.parentNode)
+                section_input.parentNode.insertAdjacentElement('beforebegin', new OptionLevel({id:input.id, name:input.value}))
                 added = true;
               }
             });
@@ -106,7 +106,9 @@ customElements.define('option-section', OptionsSection);
             if(!added) levels.appendChild( new OptionLevel({id:input.id, name:input.value}));
           });
         else
-          document.querySelector('#custom-sections input[id="'+input.id+'"]').parentNode.remove();
+          document.querySelectorAll('#custom-sections input[id="'+input.id+'"]').forEach(function(input){
+            input.parentNode.remove();
+          });
       })
     },this);
 
