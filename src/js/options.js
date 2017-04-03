@@ -1,5 +1,6 @@
 // Saves options to chrome.storage
 function save_options() {
+  console.debug('saving options');
   chrome.storage.sync.set({
     // values to save
   }, function() {
@@ -86,12 +87,17 @@ customElements.define('option-section', OptionsSection);
 
   var customs = document.querySelector("#custom-sections");
   // Load personal settings
-  chrome.storage.local.get("all_levels", function(levels){
-    if(levels == undefined) return;
+  chrome.storage.local.get(null, function(conf){
+    
+    if(conf.main_batch == undefined) 
+    { 
+      console.error("No main batch found, run tridion first"); 
+      return; 
+    }
+    
     console.log("loading levels");
     var all_lvl_container = document.querySelector("option-section");
-    var levels = new OptionLevels(levels.all_levels);
-    
+    var levels = new OptionLevels(conf.main_batch.levels);
     
     // input change listeners
     levels.querySelectorAll("input").forEach(function(input) {
@@ -123,5 +129,7 @@ customElements.define('option-section', OptionsSection);
   document.querySelector(".add_custom").addEventListener("click", function(){
     customs.appendChild(new OptionsSection("New Batch", true));
   });
+
+  document.querySelector("#save").addEventListener("click", save_options);
 
 })();
