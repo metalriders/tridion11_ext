@@ -39,9 +39,16 @@ chrome.runtime.onMessage.addListener(function(msg)
 
 	switch (msg.action) {
 		case 'init_levels':
-			chrome.storage.local.get("all_levels", function(obj){
-				if(obj == undefined){
-					chrome.storage.local.set({'all_levels': msg.data}, function() {
+			chrome.storage.local.get("main_batch", function(obj){
+				if(obj.main_batch == undefined){
+					var json = {
+						'main_batch': {
+							"levels": msg.data, 
+							"config": []
+						}
+					};
+
+					chrome.storage.local.set(json, function() {
 						console.log('Settings saved');
 					});
 				}
