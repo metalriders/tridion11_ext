@@ -11,9 +11,9 @@ Designed to help web developers/editors who uses Tridion 2011 CMS.
 
 ### Install
 
-> For now you will be able to download the file [extension.crx] directly from the repo and install it to chrome. Although you will need to remove the current and install the new one.
+> [Stable] Extension is finally published to chrome page but it is only available to those who have the link to it (pm for it).
 
-> We will be working to deliver a deployable chrome extension so you can receive updates automatically.
+> [Dev] If you intend to implement new features download the source code and add it to your chrome browser as an unpackaged extension.
 
 #### notes:
 > For a more detailed change-log, visit the CHANGELOG file.
