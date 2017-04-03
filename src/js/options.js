@@ -132,7 +132,7 @@ customElements.define('option-section', OptionsSection);
     var all_lvl_container = document.querySelector("option-section");
     var levels = new OptionLevels(ls_main_levels);
     levels.querySelectorAll("input").forEach(function(input) {
-      input.checked = ls_main_conf[input.value];
+      if(ls_main_conf != undefined) input.checked = ls_main_conf[input.value];
 
       // main level change listeners
       input.addEventListener("change", function () {
