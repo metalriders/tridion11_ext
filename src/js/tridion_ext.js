@@ -73,7 +73,7 @@ new class Tridion_Ext
     console.debug("Tridion Extension v"+ this._v +", made by Daniel G [oscar-daniel.gonzalez@hp.com]");
     var _self = this;
     
-    this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated div.children div.node");
+    this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
     
     this.publications_refs
       .forEach(function(publication) 
