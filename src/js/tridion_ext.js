@@ -8,6 +8,11 @@ var features =
     class:"item Open", 
     title: "Open selected items"
   },
+  custom_queue:{
+    id: "add_to_cust_queue",
+    class:"item Publish",
+    title: "Push to Custom Queue"
+  },
   publish_items:
   {
     id: "publihs_mult_items",
@@ -56,15 +61,17 @@ new class Tridion_Ext
   constructor()
   {
     this._v = 1.0;
+    this.dashboard = document.querySelector(".dashboard");
     this.dashboard_menu = document.querySelector("#DashboardContextMenu");
     this.dashboard_tree = document.querySelector("#DashboardTree iframe");
     this.dashboard_list = document.querySelector("#FilteredDashboardList");
+    this.sup_publishing;
+    this.custom_queue_items = [];
     this.publications_refs = [];
     this.list_lvls = [];
     this.list_items = [];
     this.items = [];
     this.lvls = {};
-
     this.init();
   }
 
@@ -86,6 +93,7 @@ new class Tridion_Ext
 
     window.postMessage({action: "init_levels", data: this.lvls}, "*");
 
+    this.add_ui();
     this.add_actions();
     this.add_observers();
   }
@@ -101,6 +109,23 @@ new class Tridion_Ext
     }    
     listeners.push({ "type": "click", "callback" : callback });
     this.feature_wr(this.pro_publishing, features.publish_items, listeners);
+  }
+
+  enable_add_to_cust_queue()
+  {
+    var _self = this;
+    var listeners = [];
+    var callback;
+    callback = function(){
+      console.log("Add to custom queue");
+      _self.items.querySelectorAll(".selected").forEach( item =>{
+        _self.custom_queue_items.push(item);
+        _self.sup_publishing.querySelector("tbody").appendChild(item.cloneNode(true));
+      });
+      _self.dashboard_menu.style.visibility = "hidden";
+    }
+    listeners.push({"type":"click", "callback": callback });
+    this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
   }
 
   enable_open_mult_items()
@@ -157,13 +182,26 @@ new class Tridion_Ext
     };
   }
 
-  feature_wr(element, feature, listeners)
+  feature_wr(element, feature, listeners, position)
   {
     element = new DashboardMenuFeature(feature, listeners);
     this.dashboard_menu.appendChild(element);
   }
 
 /* Main Functions */
+  add_ui()
+  {
+    var super_publishing = document.createElement("div");
+    var sup_table = document.createElement("table");
+    sup_table.appendChild(document.createElement("tbody"));
+    
+    super_publishing.appendChild(sup_table);
+    //var super_publishing = "<div><table><tbody></tbody></table></div>"
+
+    this.sup_publishing = super_publishing;
+    this.dashboard_list.insertAdjacentElement('afterbegin', super_publishing);
+  }
+
   add_actions()
   {
     var sep = document.createElement("li");
@@ -172,6 +210,7 @@ new class Tridion_Ext
 
     this.enable_publish_items();
     this.enable_open_mult_items();
+    this.enable_add_to_cust_queue();
   }
 
   add_observers()
