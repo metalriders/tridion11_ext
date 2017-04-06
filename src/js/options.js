@@ -63,8 +63,11 @@ class OptionsSection extends HTMLElement{
       del.textContent = "x";
       del.addEventListener("click", function(){this.parentNode.remove();});
 
+      var opt_levels = new OptionLevels(selected_levels);
+      $(title).click(function(){ $(opt_levels).toggle();});
       this.appendChild(del);
-      this.appendChild(new OptionLevels(selected_levels));
+      this.appendChild(opt_levels);
+
     }  
   }
 }
@@ -157,7 +160,9 @@ customElements.define('option-section', OptionsSection);
       })
     },this);
     all_lvl_container.appendChild(levels);
-
+    $(all_lvl_container).find("h2").click(function(){$(levels).toggle();});
+    $(all_lvl_container).find("h2").click();
+    
     if(ls_cust_batches == undefined){
       console.error("No custom batch found, create one first"); 
       return; 
