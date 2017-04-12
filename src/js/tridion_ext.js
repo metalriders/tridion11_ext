@@ -17,7 +17,7 @@ var features =
   {
     id: "publihs_mult_items",
     class:"item Publish disabled", 
-    title: "Publish selected items"
+    title: "Publish from custom Queue"
   }
 };
 
@@ -41,12 +41,11 @@ class DashboardMenuFeature
     this.element.appendChild(element_span);
     
     this.element.addEventListener("mouseover",function(){        
-        Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
-      });
+      Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
+    });
     this.element.addEventListener("click",function(){
-        // Close DashboardMenu after clicking the feature
-        //Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
-      });
+      this.parentElement.style.visibility = "hidden";
+    });
 
     listeners.forEach(function(listener) {
       _self.element.addEventListener(listener.type, listener.callback);
@@ -61,10 +60,25 @@ new class Tridion_Ext
   constructor()
   {
     this._v = 1.0;
+    // Context UI
     this.dashboard = document.querySelector(".dashboard");
     this.dashboard_menu = document.querySelector("#DashboardContextMenu");
     this.dashboard_tree = document.querySelector("#DashboardTree iframe");
     this.dashboard_list = document.querySelector("#FilteredDashboardList");
+    
+    // Publish queue UI
+    this.publish_queue = document.querySelector(".sp_main");
+    this.publish_queue_items = this.publish_queue.querySelector("tbody");
+    this.publish_queue_publishbtn = this.publish_queue.querySelector("#td11_publish_all");
+    this.publish_queue_unpublishbtn = this.publish_queue.querySelector("#td11_unpublish_all");
+    this.publish_queue_clearbtn = this.publish_queue.querySelector("#td11_clear_all");
+    this.publish_queue_lvl_selector = this.publish_queue.querySelector(".sp_batch_sel");
+
+    // Controls
+    this.publish_btn = this.dashboard_menu.querySelector("#cm_pub_publish");
+    this.unpublish_btn = this.dashboard_menu.querySelector("#cm_pub_unpublish");
+
+    // Structures
     this.sup_publishing;
     this.custom_queue_items = [];
     this.publications_refs = [];
@@ -93,7 +107,7 @@ new class Tridion_Ext
 
     window.postMessage({action: "init_levels", data: this.lvls}, "*");
 
-    this.add_ui();
+    this.init_UI();
     this.add_actions();
     this.add_observers();
   }
@@ -120,9 +134,30 @@ new class Tridion_Ext
       console.log("Add to custom queue");
       _self.items.querySelectorAll(".selected").forEach( item =>{
         _self.custom_queue_items.push(item);
-        _self.sup_publishing.querySelector("tbody").appendChild(item.cloneNode(true));
+        var details = 
+        {
+          'id': item.id,
+          'name': item.querySelector(".col1 > div").textContent,
+          'type': item.querySelector(".col2 > div").textContent,
+          'last_mod': item.querySelector(".col4 > div").textContent
+        };
+        var tr, name, type, last_mod;
+        tr = document.createElement("tr");
+        name = document.createElement("td");
+        type = document.createElement("td");
+        last_mod = document.createElement("td");
+
+        tr.id = details.id;
+        name.textContent = details.name;
+        type.textContent = details.type;
+        last_mod.textContent = details.last_mod;
+
+        tr.appendChild(name);
+        tr.appendChild(type);
+        tr.appendChild(last_mod);
+
+        _self.publish_queue.querySelector("tbody").appendChild(tr);
       });
-      _self.dashboard_menu.style.visibility = "hidden";
     }
     listeners.push({"type":"click", "callback": callback });
     this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
@@ -163,6 +198,7 @@ new class Tridion_Ext
 /* Storage */
   get_localStorage()
   {
+    window.postMessage({action: "get_publishing_batches"}, "*");
   }
 
   update_frame_items()
@@ -189,18 +225,69 @@ new class Tridion_Ext
   }
 
 /* Main Functions */
-  add_ui()
+  
+// NEED TO WORK ON THIS
+  init_UI()
   {
-    var super_publishing = document.createElement("div");
-    var sup_table = document.createElement("table");
-    sup_table.appendChild(document.createElement("tbody"));
-    
-    super_publishing.appendChild(sup_table);
-    //var super_publishing = "<div><table><tbody></tbody></table></div>"
+    var _self = this;
 
-    this.sup_publishing = super_publishing;
-    this.dashboard_list.insertAdjacentElement('afterbegin', super_publishing);
+    this.publish_queue.style.visibility="visible"
+
+    var right_clk = ()=>{
+      var evt = new MouseEvent("contextmenu", {bubbles:true});      
+      _self.items.querySelector("tr .col2[value='16']").dispatchEvent(evt);  //look for a component and dispatchEvent on it
+    }
+    var mouse_clk = (element)=>{
+      var evt = new MouseEvent("click", {
+        bubbles: true,
+        cancelable: false,
+        view: window
+      });
+      element.dispatchEvent(evt);
+    }
+
+    // custom queue publish button
+    this.publish_queue_publishbtn.addEventListener("click",()=>{
+      right_clk();
+      mouse_clk(_self.publish_btn);
+    })
+
+    // custom queue unpublish button
+    this.publish_queue_unpublishbtn.addEventListener("click",()=>{
+      right_clk();
+      mouse_clk(_self.unpublish_btn);
+    })
+
+    // Remove all elements from custom queue
+    this.publish_queue_clearbtn.addEventListener("click", 
+      (event, tbody = this.publish_queue_items)=>{
+        while (tbody.firstChild) {
+          tbody.removeChild(tbody.firstChild);
+        }
+    });
+
+    // Request custom batches {id, name} from local storage
+    // for each publish valid batch add it to queue
+    //  this.publish_queue_lvl_selector.append( <option id="batch_id"> batch name</option>);
+
+    // Add items to dashboard list items
+    var fill = function ()
+    {
+      var lvls = [245,224];
+      var tbody = _self.items.querySelector("tbody");
+      _self.publish_queue_items.querySelectorAll("tr").forEach(item => {
+        lvls.forEach(lvl=>{
+          var new_id = item.id;
+          new_id = new_id.replace(/(\S+:)\d+(-\d+)/, '$1' + lvl + '$2');
+          var new_item = document.createElement("tr");
+          new_item.id = new_id;
+          tbody.appendChild(new_item);
+          // Set new_item selected using Tridion API to publish to catch the item
+        })
+      });
+    };
   }
+// LOOK UP!
 
   add_actions()
   {
