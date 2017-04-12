@@ -16,6 +16,14 @@
 
   "options_page": "options.html",
 
+  "content_scripts":[
+    {
+      "matches":["*://*/*"],
+      "css": ["css/helpers.css"],
+      "js":["js/sup_publishing.js"]
+    }
+  ],
+
   "web_accessible_resources": [
     "js/tridion_ext.js"
   ],
