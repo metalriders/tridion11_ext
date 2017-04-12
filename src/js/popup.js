@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(msg)
 // Inject tridion_ext into page
 var scr = document.createElement('script');
 scr.type="text/javascript";
-scr.src= chrome.extension.getURL('js/tridion_ext.js');;
+scr.src= chrome.extension.getURL('js/tridion_ext.js');
 document.head.appendChild(scr);
 
 window.addEventListener("message", function(event) {
@@ -21,3 +21,6 @@ window.addEventListener("message", function(event) {
   if (event.data.action && (event.data.action == "open_item" || event.data.action == "init_levels"))    chrome.runtime.sendMessage(event.data);
 
 }, false);
+
+console.log("POPUP");
+console.log(document);
