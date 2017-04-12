@@ -21,6 +21,3 @@ window.addEventListener("message", function(event) {
   if (event.data.action && (event.data.action == "open_item" || event.data.action == "init_levels"))    chrome.runtime.sendMessage(event.data);
 
 }, false);
-
-console.log("POPUP");
-console.log(document);
