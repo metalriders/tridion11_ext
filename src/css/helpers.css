@@ -1,0 +1,32 @@
+.sp_main{
+  visibility: hidden; 
+  width: 960px;
+  height: 350px;
+  position: fixed;
+  bottom: 85px;
+  right: 200px;
+  z-index: 1;
+  background-color: blanchedalmond;
+}
+.sp_main > div:first-child{
+  height: 300px; overflow-y: scroll;
+}
+.sp_main > div:nth-child(2){
+  background-color: rgba(84, 155, 224, 0.83);
+  height: 50px;
+}
+.sp_main input[type="button"]{
+  margin: 14px;
+  float: right;
+  font-size: 12px;
+}
+.sp_batch_sel{
+  width: 331px;
+  float: left;
+  margin: 16px;
+}
+.sp_batch_sel > label{
+  margin-right: 20px;
+  color: white;
+  font-weight: bold;
+}
