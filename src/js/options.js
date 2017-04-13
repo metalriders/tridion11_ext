@@ -97,13 +97,19 @@ customElements.define('option-section', OptionsSection);
 
     // Get custom batches
     document.querySelectorAll("#custom-sections option-section").forEach(function(section){
+      var publishable = true;
       var section_conf = {
         "id": section.id,
         "name": section.querySelector("h2").textContent,
-        "conf": []
+        "conf": [],
+        "publishable": true
       };
-      section.querySelectorAll("input:checked").forEach(function(item){section_conf.conf.push(item.id);});
-
+      section.querySelectorAll("input:checked").forEach(function(item){
+        if(item.value.match(/17/) && publishable) publishable = !publishable;
+        section_conf.conf.push(item.id);
+      });
+      section_conf.publishable = publishable;
+      
       options.cust_batches.push(section_conf);
     });
 
