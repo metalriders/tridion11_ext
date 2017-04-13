@@ -246,14 +246,25 @@ new class Tridion_Ext
       element.dispatchEvent(evt);
     }
 
+    // Multi selection
+    var mult_sel = (element, first_selection)=>{ 
+      var evt = new MouseEvent("mousedown", {
+        bubbles: true,
+        ctrlKey: !first_selection
+      });
+      element.dispatchEvent(evt);
+    }
+
     // custom queue publish button
     this.publish_queue_publishbtn.addEventListener("click",()=>{
+      if(!fill()) return;
       right_clk();
       mouse_clk(_self.publish_btn);
     })
 
     // custom queue unpublish button
     this.publish_queue_unpublishbtn.addEventListener("click",()=>{
+      if(!fill()) return;
       right_clk();
       mouse_clk(_self.unpublish_btn);
     })
@@ -274,7 +285,15 @@ new class Tridion_Ext
     var fill = function ()
     {
       var lvls = [245,224];
+      var curr_lvl = window.location.href.match(/(\d+)-\d+/)[1];
+
+      if(!lvls.contains(curr_lvl)){
+        alert("Please move to a publishable level of your selected batch");
+        // Move automatically to a publishable level of selected batch
+      }
+      var first_selection = true;
       var tbody = _self.items.querySelector("tbody");
+
       _self.publish_queue_items.querySelectorAll("tr").forEach(item => {
         lvls.forEach(lvl=>{
           var new_id = item.id;
@@ -282,7 +301,8 @@ new class Tridion_Ext
           var new_item = document.createElement("tr");
           new_item.id = new_id;
           tbody.appendChild(new_item);
-          // Set new_item selected using Tridion API to publish to catch the item
+          mult_sel(new_item, first_selection);
+          if(first_selection) first_selection = !first_selection;
         })
       });
     };
