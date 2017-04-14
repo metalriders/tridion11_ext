@@ -105,11 +105,11 @@ customElements.define('option-section', OptionsSection);
         "publishable": true
       };
       section.querySelectorAll("input:checked").forEach(function(item){
-        if(item.value.match(/17/) && publishable) publishable = !publishable;
+        if(!item.value.match(/17/) && publishable) publishable = !publishable;
         section_conf.conf.push(item.id);
       });
       section_conf.publishable = publishable;
-      
+
       options.cust_batches.push(section_conf);
     });
 
