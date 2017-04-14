@@ -18,6 +18,30 @@ window.addEventListener("message", function(event) {
   if (event.source != window)
     return;
 
+  switch(event.data.action){
+    case "open_item" :
+    case "init_levels":
+      chrome.runtime.sendMessage(event.data);
+      break;
+    case "get_publishable_batches":
+      get_publishable_batches();
+    default:
+      break;
+  }
   if (event.data.action && (event.data.action == "open_item" || event.data.action == "init_levels"))    chrome.runtime.sendMessage(event.data);
-
+  
 }, false);
+
+function get_publishable_batches(){
+  // Get all publishable batches
+  console.debug("gettin publishable batches!");
+  chrome.storage.local.get(null,(storage)=>{
+    if(!storage.cust_batches) return;
+
+    var publishable_batches = [];
+    storage.cust_batches.forEach((cust_batch)=>{
+      if(cust_batch.publishable) publishable_batches.push(cust_batch);
+    });
+    window.postMessage({"action":"publishable_batches", "data": publishable_batches},"*");
+  })
+}
