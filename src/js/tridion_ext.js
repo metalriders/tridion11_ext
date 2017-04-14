@@ -72,16 +72,17 @@ new class Tridion_Ext
     this.publish_queue_publishbtn = this.publish_queue.querySelector("#td11_publish_all");
     this.publish_queue_unpublishbtn = this.publish_queue.querySelector("#td11_unpublish_all");
     this.publish_queue_clearbtn = this.publish_queue.querySelector("#td11_clear_all");
-    this.publish_queue_lvl_selector = this.publish_queue.querySelector(".sp_batch_sel");
+    this.publish_queue_lvl_selector = this.publish_queue.querySelector(".sp_batch_sel select");
 
     // Controls
     this.publish_btn = this.dashboard_menu.querySelector("#cm_pub_publish");
     this.unpublish_btn = this.dashboard_menu.querySelector("#cm_pub_unpublish");
 
-    // Structures
+    // Structures   *need to work on these*
     this.sup_publishing;
     this.custom_queue_items = [];
     this.publications_refs = [];
+    this.publishable_batches = [];
     this.list_lvls = [];
     this.list_items = [];
     this.items = [];
@@ -107,9 +108,12 @@ new class Tridion_Ext
 
     window.postMessage({action: "init_levels", data: this.lvls}, "*");
 
-    this.init_UI();
     this.add_actions();
     this.add_observers();
+    this.set_message_handler();
+    this.get_localStorage();
+    
+    this.init_UI();
   }
   
 /* Actions*/
@@ -198,7 +202,7 @@ new class Tridion_Ext
 /* Storage */
   get_localStorage()
   {
-    window.postMessage({action: "get_publishing_batches"}, "*");
+    window.postMessage({action: "get_publishable_batches"}, "*");
   }
 
   update_frame_items()
@@ -275,17 +279,18 @@ new class Tridion_Ext
         while (tbody.firstChild) {
           tbody.removeChild(tbody.firstChild);
         }
-    });
-
-    // Request custom batches {id, name} from local storage
-    // for each publish valid batch add it to queue
-    //  this.publish_queue_lvl_selector.append( <option id="batch_id"> batch name</option>);
+    });    
 
     // Add items to dashboard list items
     var fill = function ()
     {
-      var lvls = [245,224];
+      var lvls = [];
       var curr_lvl = window.location.href.match(/(\d+)-\d+/)[1];
+      var batch_id = _self.publish_queue_lvl_selector.options[_self.publish_queue_lvl_selector.selectedIndex].id;
+
+      _self.publishable_batches.forEach((batch)=>{
+        if(!lvls.length && batch.id == batch_id) lvls = batch.conf;
+      });
 
       if(!lvls.contains(curr_lvl)){
         alert("Please move to a publishable level of your selected batch");
@@ -300,11 +305,13 @@ new class Tridion_Ext
           new_id = new_id.replace(/(\S+:)\d+(-\d+)/, '$1' + lvl + '$2');
           var new_item = document.createElement("tr");
           new_item.id = new_id;
+          new_item.className = "item even cp_item";
           tbody.appendChild(new_item);
           mult_sel(new_item, first_selection);
           if(first_selection) first_selection = !first_selection;
         })
       });
+      return true;
     };
   }
 // LOOK UP!
@@ -371,5 +378,35 @@ new class Tridion_Ext
         out += String.fromCharCode(str.charCodeAt(i) % 128);
     }
     return out;
+  }
+
+  // Add publishable custom batches to selector
+  update_publishable_batches(){
+    while (this.publish_queue_lvl_selector.firstChild) {
+      this.publish_queue_lvl_selector.removeChild(this.publish_queue_lvl_selector.firstChild);
+    }
+
+    this.publishable_batches.forEach((publishable_batch)=>{
+      var option = document.createElement("option");
+      option.textContent = publishable_batch.name;
+      option.id = publishable_batch.id;
+
+      this.publish_queue_lvl_selector.append(option);
+    })
+  }
+/* MESSAGES */
+  set_message_handler(){
+    window.addEventListener("message", (event)=>{ 
+      if (event.source !== window) return;
+
+      switch(event.data.action){
+        case "publishable_batches":
+          this.publishable_batches = event.data.data;
+          this.update_publishable_batches();
+          break;
+        default:
+          break;
+      }
+    }, false);
   }
 };
