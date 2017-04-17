@@ -128,7 +128,7 @@ customElements.define('option-section', OptionsSection);
     
     if(conf.main_batch.levels == undefined) 
     { 
-      console.error("No main batch found, run tridion first"); 
+      alert("No main batch found, run tridion first"); 
       return; 
     }
     
