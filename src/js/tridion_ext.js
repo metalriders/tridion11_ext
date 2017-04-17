@@ -114,6 +114,7 @@ new class Tridion_Ext
     this.get_localStorage();
     
     this.init_UI();
+    this.restore_backup();
   }
   
 /* Actions*/
@@ -129,6 +130,28 @@ new class Tridion_Ext
     this.feature_wr(this.pro_publishing, features.publish_items, listeners);
   }
 
+  add_to_cust_queue(item)
+  {
+    this.custom_queue_items.push(item);
+
+    let tr, name, type, last_mod;
+    tr = document.createElement("tr");
+    name = document.createElement("td");
+    type = document.createElement("td");
+    last_mod = document.createElement("td");
+
+    tr.id = item.id;
+    name.textContent = item.name;
+    type.textContent = item.type;
+    last_mod.textContent = item.last_mod;
+
+    tr.appendChild(name);
+    tr.appendChild(type);
+    tr.appendChild(last_mod);
+
+    this.publish_queue.querySelector("tbody").appendChild(tr);
+  }
+
   enable_add_to_cust_queue()
   {
     var _self = this;
@@ -136,32 +159,17 @@ new class Tridion_Ext
     var callback;
     callback = function(){
       console.log("Add to custom queue");
-      _self.items.querySelectorAll(".selected").forEach( item =>{
-        _self.custom_queue_items.push(item);
-        var details = 
-        {
+      _self.items.querySelectorAll(".selected").forEach( 
+        item => {
+        let item_details = {
           'id': item.id,
           'name': item.querySelector(".col1 > div").textContent,
           'type': item.querySelector(".col2 > div").textContent,
           'last_mod': item.querySelector(".col4 > div").textContent
         };
-        var tr, name, type, last_mod;
-        tr = document.createElement("tr");
-        name = document.createElement("td");
-        type = document.createElement("td");
-        last_mod = document.createElement("td");
-
-        tr.id = details.id;
-        name.textContent = details.name;
-        type.textContent = details.type;
-        last_mod.textContent = details.last_mod;
-
-        tr.appendChild(name);
-        tr.appendChild(type);
-        tr.appendChild(last_mod);
-
-        _self.publish_queue.querySelector("tbody").appendChild(tr);
-      });
+        _self.add_to_cust_queue(item_details);
+      }
+      );
     }
     listeners.push({"type":"click", "callback": callback });
     this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
@@ -203,6 +211,13 @@ new class Tridion_Ext
   get_localStorage()
   {
     window.postMessage({action: "get_publishable_batches"}, "*");
+  }
+  
+  backup_save()
+  {
+    // backup queue
+    var queue = { items: this.custom_queue_items };
+    localStorage.setItem('tdx_bk_queue', JSON.stringify(queue));
   }
 
   update_frame_items()
@@ -264,6 +279,8 @@ new class Tridion_Ext
       if(!fill()) return;
       right_clk();
       mouse_clk(_self.publish_btn);
+      let items = _self.items.querySelectorAll(".cp_item");
+      items.forEach((item)=>item.remove());
     })
 
     // custom queue unpublish button
@@ -271,6 +288,8 @@ new class Tridion_Ext
       if(!fill()) return;
       right_clk();
       mouse_clk(_self.unpublish_btn);
+      let items = _self.items.querySelectorAll(".cp_item");
+      items.forEach((item)=>item.remove());
     })
 
     // Remove all elements from custom queue
@@ -279,6 +298,7 @@ new class Tridion_Ext
         while (tbody.firstChild) {
           tbody.removeChild(tbody.firstChild);
         }
+        _self.custom_queue_items = [];
     });    
 
     // Add items to dashboard list items
@@ -293,19 +313,42 @@ new class Tridion_Ext
       });
 
       if(!lvls.contains(curr_lvl)){
-        alert("Please move to a publishable level of your selected batch");
-        // Move automatically to a publishable level of selected batch
+        var msg = "You are not in a publishable level of your selected batch, would you like to move and publish?";
+        if(confirm(msg)){
+          
+          // move to first lvl in batch (it does not matter really)
+          // save pending action to publish and also the queue and selected batch
+          var pending_actions = [
+            { 
+              action:"publish",             
+              batch: batch_id
+            }
+          ];
+
+          // Put the object into storage
+          localStorage.setItem('tdx_pending_actions', JSON.stringify(pending_actions));
+          
+          // navigate to current path but with publishable level
+          var new_url = window.location.href.replace(/(\S+:)\d{3}(\S+)/, '$1'+lvls[0]+'$2');
+          window.location = new_url;
+          window.location.reload();
+        }
+        return false;
       }
       var first_selection = true;
+      if(_self.items.length == 0) _self.update_frame_items();
       var tbody = _self.items.querySelector("tbody");
 
       _self.publish_queue_items.querySelectorAll("tr").forEach(item => {
-        lvls.forEach(lvl=>{
+        lvls.forEach(lvl=>{ 
           var new_id = item.id;
           new_id = new_id.replace(/(\S+:)\d+(-\d+)/, '$1' + lvl + '$2');
           var new_item = document.createElement("tr");
           new_item.id = new_id;
+          new_item.name = item.title;
           new_item.className = "item even cp_item";
+          new_item.setAttribute("c:drawn", true);
+
           tbody.appendChild(new_item);
           mult_sel(new_item, first_selection);
           if(first_selection) first_selection = !first_selection;
@@ -313,6 +356,53 @@ new class Tridion_Ext
       });
       return true;
     };
+  }
+
+  restore_backup()
+  {
+    if(!localStorage.tdx_bk_queue) return;
+    let items = JSON.parse(localStorage.tdx_bk_queue);
+    var _self = this;
+
+    items.items.forEach(
+      item => this.add_to_cust_queue(item)
+    );
+  }
+
+  lookup_pending_actions(){
+    if(!localStorage.tdx_pending_actions) return;
+    var p_actions = JSON.parse(localStorage.tdx_pending_actions);
+    var p_action;
+
+    while(p_action = p_actions.pop()){
+      
+      // select option and be sure that batches had been loaded
+      let options = this.publish_queue_lvl_selector.options;
+      for(let i =0; i< options.length; i++){
+        if(options[i].id == p_action.batch){
+          options[i].selected = true;
+          break;
+        }
+      }
+
+      var evt = new MouseEvent("click", {
+        bubbles: false,
+        cancelable: false,
+        view: window
+      });
+
+      switch(p_action.action){
+        case "publish":
+          this.publish_queue_publishbtn.dispatchEvent(evt);
+          break;
+        case "unpublish":
+          this.unpublish_queue_publishbtn.dispatchEvent(evt);
+          break;
+        default:
+          break;
+      }
+    }
+    localStorage.removeItem("tdx_pending_actions");
   }
 // LOOK UP!
 
@@ -331,9 +421,11 @@ new class Tridion_Ext
   {
     var _self = this;
     
+    // Observer for loading on item list
     this.observer_wr(
-      this.dashboard_list, { subtree: true, childList: true},function()
-      {
+      this.dashboard_list, 
+      { subtree: true, childList: true}
+      ,() => {
         _self.list_items = document.querySelector("#FilteredItemsList_frame_details");
         if(_self.list_items != null)
         {
@@ -342,9 +434,22 @@ new class Tridion_Ext
             if(this.contentWindow.document.body.innerText == "") return;
             _self.update_frame_items();
           });
-          this.disconnect();
         }
-      });
+      }
+    );
+
+    // Observer for batches loading
+    this.observer_wr(
+      this.publish_queue_lvl_selector, 
+      {subtree:true, childList:true},
+      () => {
+        _self.lookup_pending_actions();
+      }
+    );
+
+    // Backup
+    window.addEventListener("hashchange", (e)=>_self.backup_save());
+    window.addEventListener("beforeunload", (e)=>_self.backup_save());
   }
 
   process_items()
