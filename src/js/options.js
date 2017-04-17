@@ -126,7 +126,7 @@ customElements.define('option-section', OptionsSection);
   // Load personal settings
   chrome.storage.local.get(null, function(conf){
     
-    if(conf.main_batch.levels == undefined) 
+    if(conf.main_batch == undefined || conf.main_batch.levels == undefined) 
     { 
       alert("No main batch found, run tridion first"); 
       return; 
