@@ -88,6 +88,9 @@ new class Tridion_Ext
     this.items = [];
     this.lvls = {};
     this.init();
+
+    // Flags
+    this.batches_loaded = false;
   }
 
   init()
@@ -159,13 +162,16 @@ new class Tridion_Ext
     var callback;
     callback = function(){
       console.log("Add to custom queue");
+
+      var current_folder = window.location.hash.match(/\w{3}-(\w+)-/)[1];
       _self.items.querySelectorAll(".selected").forEach( 
         item => {
         let item_details = {
           'id': item.id,
           'name': item.querySelector(".col1 > div").textContent,
           'type': item.querySelector(".col2 > div").textContent,
-          'last_mod': item.querySelector(".col4 > div").textContent
+          'last_mod': item.querySelector(".col4 > div").textContent,
+          'folder' : current_folder
         };
         _self.add_to_cust_queue(item_details);
       }
@@ -305,15 +311,22 @@ new class Tridion_Ext
     var fill = function ()
     {
       var lvls = [];
-      var curr_lvl = window.location.href.match(/(\d+)-\d+/)[1];
+      let matches = window.location.hash.match(/(\d+)-(\d+)-/);
+      var curr_lvl = matches[1];
+      var curr_folder = matches[2];
       var batch_id = _self.publish_queue_lvl_selector.options[_self.publish_queue_lvl_selector.selectedIndex].id;
 
       _self.publishable_batches.forEach((batch)=>{
         if(!lvls.length && batch.id == batch_id) lvls = batch.conf;
       });
 
-      if(!lvls.contains(curr_lvl)){
-        var msg = "You are not in a publishable level of your selected batch, would you like to move and publish?";
+      var valid_folder = false;
+      _self.custom_queue_items.forEach( item => {
+        if(item.folder == curr_folder && !valid_folder) valid_folder = true;
+      });
+      if(!lvls.contains(curr_lvl) || !valid_folder){
+        var msg = "You are not in a valid level/folder to publish, " +
+                  "would you like to do move to valid location and publish current queue?";
         if(confirm(msg)){
           
           // move to first lvl in batch (it does not matter really)
@@ -321,39 +334,43 @@ new class Tridion_Ext
           var pending_actions = [
             { 
               action:"publish",             
-              batch: batch_id
+              batch: batch_id,
             }
           ];
 
           // Put the object into storage
           localStorage.setItem('tdx_pending_actions', JSON.stringify(pending_actions));
           
-          // navigate to current path but with publishable level
-          var new_url = window.location.href.replace(/(\S+:)\d{3}(\S+)/, '$1'+lvls[0]+'$2');
+          // navigate to current path but with valid level and folder to publish
+          var new_url = window.location.href.replace(/(\S+:)\d+(\S+)/, '$1'+lvls[0]+'-'+_self.custom_queue_items[0].folder+ '-2');
           window.location = new_url;
           window.location.reload();
         }
         return false;
       }
+
       var first_selection = true;
       if(_self.items.length == 0) _self.update_frame_items();
       var tbody = _self.items.querySelector("tbody");
 
-      _self.publish_queue_items.querySelectorAll("tr").forEach(item => {
-        lvls.forEach(lvl=>{ 
-          var new_id = item.id;
-          new_id = new_id.replace(/(\S+:)\d+(-\d+)/, '$1' + lvl + '$2');
-          var new_item = document.createElement("tr");
-          new_item.id = new_id;
-          new_item.name = item.title;
-          new_item.className = "item even cp_item";
-          new_item.setAttribute("c:drawn", true);
+      _self.custom_queue_items.forEach(
+        (item)=>{
+          lvls.forEach( lvl =>{
+            let new_item = document.createElement("tr");
+            let new_id = item.id.replace(/(\S+:)\d+(-\d+)/, '$1' + lvl + '$2');
 
-          tbody.appendChild(new_item);
-          mult_sel(new_item, first_selection);
-          if(first_selection) first_selection = !first_selection;
-        })
-      });
+            new_item.id = new_id;
+            new_item.name = item.name;
+            new_item.className = "item even cp_item";
+            new_item.setAttribute("c:drawn", true);
+
+            tbody.appendChild(new_item);
+            mult_sel(new_item, first_selection);
+            if(first_selection) first_selection = !first_selection;
+          });
+        }
+      );
+      
       return true;
     };
   }
@@ -433,19 +450,14 @@ new class Tridion_Ext
           {
             if(this.contentWindow.document.body.innerText == "") return;
             _self.update_frame_items();
+
+            // while(!_self.batches_loaded);
+            _self.lookup_pending_actions();
           });
         }
       }
     );
 
-    // Observer for batches loading
-    this.observer_wr(
-      this.publish_queue_lvl_selector, 
-      {subtree:true, childList:true},
-      () => {
-        _self.lookup_pending_actions();
-      }
-    );
 
     // Backup
     window.addEventListener("hashchange", (e)=>_self.backup_save());
@@ -498,6 +510,8 @@ new class Tridion_Ext
 
       this.publish_queue_lvl_selector.append(option);
     })
+    
+    this.batches_loaded = true;
   }
 /* MESSAGES */
   set_message_handler(){
