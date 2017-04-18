@@ -27,9 +27,7 @@ window.addEventListener("message", function(event) {
       get_publishable_batches();
     default:
       break;
-  }
-  if (event.data.action && (event.data.action == "open_item" || event.data.action == "init_levels"))    chrome.runtime.sendMessage(event.data);
-  
+  }  
 }, false);
 
 function get_publishable_batches(){
