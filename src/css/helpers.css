@@ -1,4 +1,5 @@
 .sp_main{    
+  visibility: hidden;
   width: 960px;
   height: 364px;
   position: fixed;
