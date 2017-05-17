@@ -1,5 +1,3 @@
-// Author: Daniel G (oscar-daniel.gonzalez@hp.com)
-
 var features = 
 {
   open_items: 
@@ -40,26 +38,34 @@ class DashboardMenuFeature
     this.element.appendChild(element_div);
     this.element.appendChild(element_span);
     
-    this.element.addEventListener("mouseover",function(){        
-      Tridion.Controls.ContextMenu.prototype._hightlightItem(this); 
-    });
-    this.element.addEventListener("click",function(){
-      this.parentElement.style.visibility = "hidden";
-    });
+    this.element.addEventListener(
+      "mouseover",
+      ()=> Tridion.Controls.ContextMenu.prototype._hightlightItem(this)
+    );
+    this.element.addEventListener(
+      "click",
+      ()=> this.parentElement.style.visibility = "hidden"
+    );
 
-    listeners.forEach(function(listener) {
-      _self.element.addEventListener(listener.type, listener.callback);
-    });
+    listeners.forEach(
+      listener => _self.element.addEventListener(listener.type, listener.callback)
+    );
 
     return this.element;
   }
 }
 
+/**
+ * 
+ * 
+ * @class Tridion_Ext
+ */
 new class Tridion_Ext
 {  
   constructor()
   {
     this._v = 1.0;
+
     // Context UI
     this.dashboard = document.querySelector(".dashboard");
     this.dashboard_menu = document.querySelector("#DashboardContextMenu");
@@ -69,9 +75,9 @@ new class Tridion_Ext
     // Publish queue UI
     this.publish_queue = document.querySelector(".sp_main");
     this.publish_queue_items = this.publish_queue.querySelector("tbody");
-    this.publish_queue_publishbtn = this.publish_queue.querySelector("#td11_publish_all");
-    this.publish_queue_unpublishbtn = this.publish_queue.querySelector("#td11_unpublish_all");
-    this.publish_queue_clearbtn = this.publish_queue.querySelector("#td11_clear_all");
+    this.publish_queue_publish_btn = this.publish_queue.querySelector("#td11_publish_all");
+    this.publish_queue_unpublish_btn = this.publish_queue.querySelector("#td11_unpublish_all");
+    this.publish_queue_clear_btn = this.publish_queue.querySelector("#td11_clear_all");
     this.publish_queue_lvl_selector = this.publish_queue.querySelector(".sp_batch_sel select");
 
     // Controls
@@ -83,10 +89,10 @@ new class Tridion_Ext
     this.custom_queue_items = [];
     this.publications_refs = [];
     this.publishable_batches = [];
-    this.list_lvls = [];
+    this.list_levels = [];
     this.list_items = [];
     this.items = [];
-    this.lvls = {};
+    this.levels = {};
     this.init();
 
     // Flags
@@ -95,7 +101,7 @@ new class Tridion_Ext
 
   init()
   {
-    console.debug("Tridion Extension v"+ this._v +", made by Daniel G [oscar-daniel.gonzalez@hp.com]");
+    console.debug("Tridion Extension v"+ this._v);
     var _self = this;
     
     this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
@@ -106,10 +112,10 @@ new class Tridion_Ext
         var id = publication.id.split(':')[1].split('-')[1];
         var lvl = publication.querySelector(".header .title").title;
         lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
-        _self.lvls[unescape(lvl)] = id;
+        _self.levels[unescape(lvl)] = id;
       });
 
-    window.postMessage({action: "init_levels", data: this.lvls}, "*");
+    window.postMessage({action: "init_levels", data: this.levels}, "*");
 
     this.add_actions();
     this.add_observers();
@@ -126,14 +132,15 @@ new class Tridion_Ext
     var listeners = [];
     var callback;
 
-    callback = function(){
+    callback = ()=>
+    {
       console.log("Publishing items");
     }    
     listeners.push({ "type": "click", "callback" : callback });
     this.feature_wr(this.pro_publishing, features.publish_items, listeners);
   }
 
-  add_to_cust_queue(item)
+  add_to_custom_queue(item)
   {
     this.custom_queue_items.push(item);
 
@@ -155,33 +162,35 @@ new class Tridion_Ext
     this.publish_queue.querySelector("tbody").appendChild(tr);
   }
 
-  enable_add_to_cust_queue()
+  enable_add_to_custom_queue()
   {
     var _self = this;
     var listeners = [];
     var callback;
-    callback = function(){
+    callback = ()=>{
       console.log("Add to custom queue");
 
       var current_folder = window.location.hash.match(/\w{3}-(\w+)-/)[1];
-      _self.items.querySelectorAll(".selected").forEach( 
-        item => {
-        let item_details = {
-          'id': item.id,
-          'name': item.querySelector(".col1 > div").textContent,
-          'type': item.querySelector(".col2 > div").textContent,
-          'last_mod': item.querySelector(".col4 > div").textContent,
-          'folder' : current_folder
-        };
-        _self.add_to_cust_queue(item_details);
-      }
+      _self.items.querySelectorAll(".selected")
+        .forEach( item => 
+        {
+          let item_details = 
+          {
+            'id': item.id,
+            'name': item.querySelector(".col1 > div").textContent,
+            'type': item.querySelector(".col2 > div").textContent,
+            'last_mod': item.querySelector(".col4 > div").textContent,
+            'folder' : current_folder
+          };
+          _self.add_to_custom_queue(item_details);
+        }
       );
     }
     listeners.push({"type":"click", "callback": callback });
     this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
   }
 
-  enable_open_mult_items()
+  enable_open_multiple_items()
   {
     var _self = this;
     var listeners = [];
@@ -198,8 +207,8 @@ new class Tridion_Ext
         {
           if(item.type == 16)  // component
           {
-            console.log("Opening tcm"+ item.tcm_id + " from lvl-id:" + item.lvl);
-            var url_base = document.location.origin +"/WebUI/item.aspx?tcm=16#id=tcm:"+item.lvl+"-"+item.tcm_id;
+            console.log("Opening", `${item.tcm_id} from lvl-id: ${item.lvl}`);
+            var url_base = `${document.location.origin}/WebUI/item.aspx?tcm=16#id=tcm:${item.lvl}-${item.tcm_id}`;
             window.postMessage({action: "open_item", url: url_base}, "*");    // send a message to background to handle request
           }
           else        // everything else
@@ -210,7 +219,7 @@ new class Tridion_Ext
       // Tridion does not support double click trigger on folder      
     }
     listeners.push({ "type": "click", "callback" : callback });
-    this.feature_wr(this.mult_open, features.open_items, listeners);
+    this.feature_wr(this.multiple_open, features.open_items, listeners);
   }
 
 /* Storage */
@@ -238,9 +247,7 @@ new class Tridion_Ext
   {
     var observer = new MutationObserver(callback);
     observer.observe(target, config);
-    return function removeElementChange() {
-        observer.disconnect();
-    };
+    observer.disconnect()
   }
 
   feature_wr(element, feature, listeners, position)
@@ -262,7 +269,7 @@ new class Tridion_Ext
       var evt = new MouseEvent("contextmenu", {bubbles:true});      
       _self.items.querySelector("tr .col2[value='16']").dispatchEvent(evt);  //look for a component and dispatchEvent on it
     }
-    var mouse_clk = (element)=>{
+    var mouse_clk = element =>{
       var evt = new MouseEvent("click", {
         bubbles: true,
         cancelable: false,
@@ -272,7 +279,7 @@ new class Tridion_Ext
     }
 
     // Multi selection
-    var mult_sel = (element, first_selection)=>{ 
+    var multiple_sel = (element, first_selection)=>{ 
       var evt = new MouseEvent("mousedown", {
         bubbles: true,
         ctrlKey: !first_selection
@@ -281,25 +288,25 @@ new class Tridion_Ext
     }
 
     // custom queue publish button
-    this.publish_queue_publishbtn.addEventListener("click",()=>{
+    this.publish_queue_publish_btn.addEventListener("click",()=>{
       if(!fill()) return;
       right_clk();
       mouse_clk(_self.publish_btn);
       let items = _self.items.querySelectorAll(".cp_item");
-      items.forEach((item)=>item.remove());
+      items.forEach(item =>item.remove());
     })
 
     // custom queue unpublish button
-    this.publish_queue_unpublishbtn.addEventListener("click",()=>{
+    this.publish_queue_unpublish_btn.addEventListener("click",()=>{
       if(!fill()) return;
       right_clk();
       mouse_clk(_self.unpublish_btn);
       let items = _self.items.querySelectorAll(".cp_item");
-      items.forEach((item)=>item.remove());
+      items.forEach(item =>item.remove());
     })
 
     // Remove all elements from custom queue
-    this.publish_queue_clearbtn.addEventListener("click", 
+    this.publish_queue_clear_btn.addEventListener("click", 
       (event, tbody = this.publish_queue_items)=>{
         while (tbody.firstChild) {
           tbody.removeChild(tbody.firstChild);
@@ -310,21 +317,21 @@ new class Tridion_Ext
     // Add items to dashboard list items
     var fill = function ()
     {
-      var lvls = [];
+      var levels = [];
       let matches = window.location.hash.match(/(\d+)-(\d+)-/);
       var curr_lvl = matches[1];
       var curr_folder = matches[2];
       var batch_id = _self.publish_queue_lvl_selector.options[_self.publish_queue_lvl_selector.selectedIndex].id;
 
-      _self.publishable_batches.forEach((batch)=>{
-        if(!lvls.length && batch.id == batch_id) lvls = batch.conf;
+      _self.publishable_batches.forEach( batch =>{
+        if(!levels.length && batch.id == batch_id) levels = batch.conf;
       });
 
       var valid_folder = false;
       _self.custom_queue_items.forEach( item => {
         if(item.folder == curr_folder && !valid_folder) valid_folder = true;
       });
-      if(!lvls.contains(curr_lvl) || !valid_folder){
+      if(!levels.contains(curr_lvl) || !valid_folder){
         var msg = "You are not in a valid level/folder to publish, " +
                   "would you like to do move to valid location and publish current queue?";
         if(confirm(msg)){
@@ -342,7 +349,7 @@ new class Tridion_Ext
           localStorage.setItem('tdx_pending_actions', JSON.stringify(pending_actions));
           
           // navigate to current path but with valid level and folder to publish
-          var new_url = window.location.href.replace(/(\S+:)\d+(\S+)/, '$1'+lvls[0]+'-'+_self.custom_queue_items[0].folder+ '-2');
+          var new_url = window.location.href.replace(/(\S+:)\d+(\S+)/, '$1'+levels[0]+'-'+_self.custom_queue_items[0].folder+ '-2');
           window.location = new_url;
           window.location.reload();
         }
@@ -354,8 +361,8 @@ new class Tridion_Ext
       var tbody = _self.items.querySelector("tbody");
 
       _self.custom_queue_items.forEach(
-        (item)=>{
-          lvls.forEach( lvl =>{
+        item =>{
+          levels.forEach( lvl =>{
             let new_item = document.createElement("tr");
             let new_id = item.id.replace(/(\S+:)\d+(-\d+)/, '$1' + lvl + '$2');
 
@@ -365,7 +372,7 @@ new class Tridion_Ext
             new_item.setAttribute("c:drawn", true);
 
             tbody.appendChild(new_item);
-            mult_sel(new_item, first_selection);
+            multiple_sel(new_item, first_selection);
             if(first_selection) first_selection = !first_selection;
           });
         }
@@ -382,7 +389,7 @@ new class Tridion_Ext
     var _self = this;
 
     items.items.forEach(
-      item => this.add_to_cust_queue(item)
+      item => this.add_to_custom_queue(item)
     );
   }
 
@@ -410,10 +417,10 @@ new class Tridion_Ext
 
       switch(p_action.action){
         case "publish":
-          this.publish_queue_publishbtn.dispatchEvent(evt);
+          this.publish_queue_publish_btn.dispatchEvent(evt);
           break;
         case "unpublish":
-          this.unpublish_queue_publishbtn.dispatchEvent(evt);
+          this.unpublish_queue_publish_btn.dispatchEvent(evt);
           break;
         default:
           break;
@@ -430,8 +437,8 @@ new class Tridion_Ext
     this.dashboard_menu.appendChild(sep);
 
     this.enable_publish_items();
-    this.enable_open_mult_items();
-    this.enable_add_to_cust_queue();
+    this.enable_open_multiple_items();
+    this.enable_add_to_custom_queue();
   }
 
   add_observers()
@@ -460,8 +467,8 @@ new class Tridion_Ext
 
 
     // Backup
-    window.addEventListener("hashchange", (e)=>_self.backup_save());
-    window.addEventListener("beforeunload", (e)=>_self.backup_save());
+    window.addEventListener("hashchange", e =>_self.backup_save());
+    window.addEventListener("beforeunload", e =>_self.backup_save());
   }
 
   process_items()
@@ -471,23 +478,29 @@ new class Tridion_Ext
       .forEach(function(row) 
       {
         var cols = row.querySelectorAll("td");
-        var item_lvl = cols[3].querySelector("div");
-        var txt_lvl = _self.unicode_to_ascii(item_lvl.innerText);
+        var item_level = cols[3].querySelector("div");
+        var txt_level = _self.unicode_to_ascii(item_level.innerText);
 
         row.tcm_id = row.id.split(':')[1].split('-')[1];
         row.type = cols[2].getAttribute("value");
         
-        row.lvl = (txt_lvl == "" || txt_lvl == "(Local copy)")? 
-          row.id.split(':')[1].split('-')[0] : _self.lvls[txt_lvl];
+        row.lvl = (txt_level == "" || txt_level == "(Local copy)")? 
+          row.id.split(':')[1].split('-')[0] : _self.levels[txt_level];
       });
   }
 
 /* UTILS */  
-  get_id_by_lvl(lvl)    // Deprecated
+  get_id_by_lvl(level)    // Deprecated
   {
-    return this.lvls[lvl];
+    return this.levels[level];
   }
 
+  /**
+   * Convert any string from unicode to ascii values
+   * 
+   * @param {any} string 
+   * @returns {out} converted string
+   */
   unicode_to_ascii(str)
   {
     var out = "";
@@ -497,13 +510,16 @@ new class Tridion_Ext
     return out;
   }
 
-  // Add publishable custom batches to selector
+
+  /**
+   *  Add publishable custom batches to selector
+   */
   update_publishable_batches(){
     while (this.publish_queue_lvl_selector.firstChild) {
       this.publish_queue_lvl_selector.removeChild(this.publish_queue_lvl_selector.firstChild);
     }
 
-    this.publishable_batches.forEach((publishable_batch)=>{
+    this.publishable_batches.forEach(publishable_batch =>{
       var option = document.createElement("option");
       option.textContent = publishable_batch.name;
       option.id = publishable_batch.id;
@@ -513,9 +529,12 @@ new class Tridion_Ext
     
     this.batches_loaded = true;
   }
-/* MESSAGES */
+
+  /**
+   * Handle and filter messages sent to this page
+   */
   set_message_handler(){
-    window.addEventListener("message", (event)=>{ 
+    window.addEventListener("message", event =>{ 
       if (event.source !== window) return;
 
       switch(event.data.action){

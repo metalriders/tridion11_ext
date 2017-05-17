@@ -1,4 +1,8 @@
-
+/**
+ * Construct elements used in options page and provide
+ * functionality to edit custom batches used for extension.
+ */
+ 
 var chrome_storage = chrome.storage;
 var chrome_storage_local = chrome_storage.local;
 var chrome_storage_sync = chrome_storage.sync;
@@ -94,6 +98,10 @@ customElements.define('option-section', OptionsSection);
   var main_conf;
   var custom_batches;
 
+  /**
+   * Save options to chrome local storage.
+   * This will save your selected main batch levels and update custom batches.
+   */
   function save_options() {    
     var options = {
       "main_batch":{
@@ -109,7 +117,7 @@ customElements.define('option-section', OptionsSection);
 
     // Get custom batches
     document.querySelectorAll("#custom-sections option-section")
-      .forEach( (section)=>
+      .forEach( section =>
       {
         var publishable = true;
         var section_conf = 
@@ -121,7 +129,7 @@ customElements.define('option-section', OptionsSection);
         };
 
         section.querySelectorAll("input:checked")
-          .forEach( (item)=>
+          .forEach( item =>
           {
             if(!item.value.match(/17/) && publishable) publishable = !publishable;
             section_conf.conf.push(item.id);
@@ -145,7 +153,7 @@ customElements.define('option-section', OptionsSection);
   // Load personal settings
   chrome_storage_local
     .get( null, 
-      (conf)=> 
+      conf => 
       {
         if(conf.main_batch == undefined || conf.main_batch.levels == undefined) 
         { 
@@ -164,7 +172,7 @@ customElements.define('option-section', OptionsSection);
   
         // Load Main batch
         levels.querySelectorAll("input")
-          .forEach( (level)=> 
+          .forEach( level => 
           {
             if(main_conf != undefined) level.checked = main_conf[level.value];
 
@@ -175,11 +183,11 @@ customElements.define('option-section', OptionsSection);
               if(this.checked)
               {
                 document.querySelectorAll("#custom-sections option-levels")
-                  .forEach((levels)=>
+                  .forEach(levels =>
                   {
                     let added = false;
                     levels.querySelectorAll("input")
-                      .forEach( (section_level)=>
+                      .forEach( section_level =>
                       {
                         if(section_level.value > level.value && !added){
                           section_level
@@ -201,7 +209,7 @@ customElements.define('option-section', OptionsSection);
               }
               else
                 document.querySelectorAll(`#custom-sections input[id="${level.id}"]`)
-                  .forEach( (input)=> input.parentNode.remove() );
+                  .forEach( input => input.parentNode.remove() );
             });
           }
           ,this);
@@ -219,13 +227,13 @@ customElements.define('option-section', OptionsSection);
 
         // Load custom batches
         let custom_batches_container = document.querySelector("#custom-sections");
-        custom_batches.forEach((section)=>
+        custom_batches.forEach(section =>
         {
           var custom_batch = new OptionsSection(section.name, true, section.id);
           
           // turn on selected items
           section.conf.forEach(
-            (level)=> custom_batch.querySelector('[id="'+level+'"]').checked = true);
+            level => custom_batch.querySelector('[id="'+level+'"]').checked = true);
 
           custom_batches_container.appendChild(custom_batch);
         })

@@ -14,7 +14,7 @@ chrome.webNavigation.onCompleted.addListener(
 		details["file"] = "js/popup.js";
 		chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded tridion_ext"));
 	}
-	// URLfilter
+	// URL filter
 	, {url:[{pathContains:"ListFilters/SearchListBar.aspx"}]}		
 );
 

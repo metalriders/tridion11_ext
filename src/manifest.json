@@ -21,6 +21,10 @@
       "matches":["*://*/*"],
       "css": ["css/helpers.css"],
       "js":["js/sup_publishing.js"]
+    },
+    {
+      "matches":["*://*/*"],
+      "js":["js/popup.js"]
     }
   ],
 
