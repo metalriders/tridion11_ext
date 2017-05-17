@@ -10,8 +10,28 @@ var chrome_storage_sync = chrome_storage.sync;
 // Reserved for communications
 chrome.runtime.onMessage.addListener(function(msg)
 {
-  alert("Popup - Yo I got a message!");
-  console.debug(msg);
+  switch(msg){
+    case "init_levels":
+      let dashboard = document.querySelector("#DashboardTree iframe");
+      let publications_ref = dashboard.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
+      var levels = {};
+      
+      console.log("Getting levels first time");
+
+      publications_ref.forEach(
+        publication_el => 
+        {
+          var id = publication_el.id.split(':')[1].split('-')[1];
+          var level = publication_el.querySelector(".header .title").title;
+          level = level.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
+          levels[unescape(level)] = id;
+        });
+
+      console.log("List of formated levels", levels);
+      chrome.runtime.sendMessage({action: "init_levels", data: levels});
+      break;
+    default: break;
+  }
 });
 
 // Inject tridion_ext into page
@@ -29,7 +49,7 @@ window.addEventListener("message", function(event) {
   switch(event.data.action){
     case "open_item" :
     case "init_levels":
-      chrome.runtime.sendMessage(event.data);
+      // chrome.runtime.sendMessage(event.data);
       break;
     case "get_publishable_batches":
       get_publishable_batches();
@@ -55,26 +75,3 @@ function get_publishable_batches(){
     window.postMessage({"action":"publishable_batches", "data": publishable_batches},"*");
   })
 }
-
-(()=>{
-  var dashboard_tree = document.querySelector("#DashboardTree");
-  // listen for a change on dashboard
-  console.debug("Got dashboard");
-  dashboard_tree.onload = ()=>{
-    let dashboard_doc = dashboard_tree.contentDocument;
-    let dom_selector = "div.rootNode.populated > div.children.visible > div.node";
-    let publications_refs = dashboard_doc.querySelectorAll(dom_selector);
-    var levels = [];
-
-    publications_refs.forEach(
-      publication =>
-      {
-        let id = publication.id.split(':')[1].split('-')[1];
-        let lvl = publication.querySelector(".header .title").title;
-        lvl = lvl.replace(/ \(tcm.*\)/g, "");
-        levels[unescape(lvl)] = id;
-      }
-    );
-    chrome.runtime.sendMessage({action: "init_levels", data: levels});
-  };
-})();

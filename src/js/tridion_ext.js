@@ -104,18 +104,18 @@ new class Tridion_Ext
     console.debug("Tridion Extension v"+ this._v);
     var _self = this;
     
-    this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
+    // this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
     
-    this.publications_refs
-      .forEach(function(publication) 
-      {
-        var id = publication.id.split(':')[1].split('-')[1];
-        var lvl = publication.querySelector(".header .title").title;
-        lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
-        _self.levels[unescape(lvl)] = id;
-      });
+    // this.publications_refs
+    //   .forEach(function(publication) 
+    //   {
+    //     var id = publication.id.split(':')[1].split('-')[1];
+    //     var lvl = publication.querySelector(".header .title").title;
+    //     lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
+    //     _self.levels[unescape(lvl)] = id;
+    //   });
 
-    window.postMessage({action: "init_levels", data: this.levels}, "*");
+    // window.postMessage({action: "init_levels", data: this.levels}, "*");
 
     this.add_actions();
     this.add_observers();
