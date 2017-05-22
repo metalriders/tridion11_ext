@@ -1,13 +1,10 @@
-.sp_main{    
-  visibility: hidden;
+.sp_main{
   width: 960px;
   height: 364px;
   position: fixed;
-  /*top: 85px;
-  left: 200px;*/
-  top: 599px;
-  left: 800px;
-  z-index: 1;
+  top: 1%;
+  right: 1%;
+  z-index: 100;
   background-color: #19a0c5;
   font-family: 'Open Sans', sans-serif;
 }

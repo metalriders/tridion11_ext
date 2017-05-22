@@ -14,6 +14,16 @@
     "<all_urls>"
   ],
 
+  "commands":{
+    "_execute_page_action":{
+      "suggested_key":{
+        "default": "Alt+T"
+      },
+      "description":"This tool will help web editors to ease usage of tridion 2011",
+      "global": true
+    }
+  },
+
   "options_page": "options.html",
 
   "content_scripts":[

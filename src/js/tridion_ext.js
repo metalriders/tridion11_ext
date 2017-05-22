@@ -40,11 +40,11 @@ class DashboardMenuFeature
     
     this.element.addEventListener(
       "mouseover",
-      ()=> Tridion.Controls.ContextMenu.prototype._hightlightItem(this)
+      ()=> Tridion.Controls.ContextMenu.prototype._hightlightItem(this.element)
     );
     this.element.addEventListener(
       "click",
-      ()=> this.parentElement.style.visibility = "hidden"
+      ()=> this.element.parentElement.style.visibility = "hidden"
     );
 
     listeners.forEach(
@@ -57,19 +57,18 @@ class DashboardMenuFeature
 
 /**
  * 
- * 
+ * Instant instantiation
  * @class Tridion_Ext
  */
 new class Tridion_Ext
 {  
   constructor()
   {
-    this._v = 1.0;
+    this._v = 0.3;
 
     // Context UI
     this.dashboard = document.querySelector(".dashboard");
     this.dashboard_menu = document.querySelector("#DashboardContextMenu");
-    this.dashboard_tree = document.querySelector("#DashboardTree iframe");
     this.dashboard_list = document.querySelector("#FilteredDashboardList");
     
     // Publish queue UI
@@ -93,10 +92,11 @@ new class Tridion_Ext
     this.list_items = [];
     this.items = [];
     this.levels = {};
-    this.init();
 
     // Flags
     this.batches_loaded = false;
+
+    this.init();
   }
 
   init()
@@ -104,19 +104,6 @@ new class Tridion_Ext
     console.debug("Tridion Extension v"+ this._v);
     var _self = this;
     
-    // this.publications_refs = this.dashboard_tree.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
-    
-    // this.publications_refs
-    //   .forEach(function(publication) 
-    //   {
-    //     var id = publication.id.split(':')[1].split('-')[1];
-    //     var lvl = publication.querySelector(".header .title").title;
-    //     lvl = lvl.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
-    //     _self.levels[unescape(lvl)] = id;
-    //   });
-
-    // window.postMessage({action: "init_levels", data: this.levels}, "*");
-
     this.add_actions();
     this.add_observers();
     this.set_message_handler();
@@ -125,150 +112,25 @@ new class Tridion_Ext
     this.init_UI();
     this.restore_backup();
   }
-  
-/* Actions*/
-  enable_publish_items()
-  {
-    var listeners = [];
-    var callback;
-
-    callback = ()=>
-    {
-      console.log("Publishing items");
-    }    
-    listeners.push({ "type": "click", "callback" : callback });
-    this.feature_wr(this.pro_publishing, features.publish_items, listeners);
-  }
-
-  add_to_custom_queue(item)
-  {
-    this.custom_queue_items.push(item);
-
-    let tr, name, type, last_mod;
-    tr = document.createElement("tr");
-    name = document.createElement("td");
-    type = document.createElement("td");
-    last_mod = document.createElement("td");
-
-    tr.id = item.id;
-    name.textContent = item.name;
-    type.textContent = item.type;
-    last_mod.textContent = item.last_mod;
-
-    tr.appendChild(name);
-    tr.appendChild(type);
-    tr.appendChild(last_mod);
-
-    this.publish_queue.querySelector("tbody").appendChild(tr);
-  }
-
-  enable_add_to_custom_queue()
-  {
-    var _self = this;
-    var listeners = [];
-    var callback;
-    callback = ()=>{
-      console.log("Add to custom queue");
-
-      var current_folder = window.location.hash.match(/\w{3}-(\w+)-/)[1];
-      _self.items.querySelectorAll(".selected")
-        .forEach( item => 
-        {
-          let item_details = 
-          {
-            'id': item.id,
-            'name': item.querySelector(".col1 > div").textContent,
-            'type': item.querySelector(".col2 > div").textContent,
-            'last_mod': item.querySelector(".col4 > div").textContent,
-            'folder' : current_folder
-          };
-          _self.add_to_custom_queue(item_details);
-        }
-      );
-    }
-    listeners.push({"type":"click", "callback": callback });
-    this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
-  }
-
-  enable_open_multiple_items()
-  {
-    var _self = this;
-    var listeners = [];
-    var callback;
-
-    callback = function()
-    {
-      _self.update_frame_items();              // quick fix for
-      if(_self.items.length == 0) return;
-      var sel_items = _self.items.querySelectorAll("tr.selected");
-      
-      sel_items
-        .forEach(function(item) 
-        {
-          if(item.type == 16)  // component
-          {
-            console.log("Opening", `${item.tcm_id} from lvl-id: ${item.lvl}`);
-            var url_base = `${document.location.origin}/WebUI/item.aspx?tcm=16#id=tcm:${item.lvl}-${item.tcm_id}`;
-            window.postMessage({action: "open_item", url: url_base}, "*");    // send a message to background to handle request
-          }
-          else        // everything else
-          {
-            console.error("Type not supported yet :P");
-          }
-        });
-      // Tridion does not support double click trigger on folder      
-    }
-    listeners.push({ "type": "click", "callback" : callback });
-    this.feature_wr(this.multiple_open, features.open_items, listeners);
-  }
-
-/* Storage */
-  get_localStorage()
-  {
-    window.postMessage({action: "get_publishable_batches"}, "*");
-  }
-  
-  backup_save()
-  {
-    // backup queue
-    var queue = { items: this.custom_queue_items };
-    localStorage.setItem('tdx_bk_queue', JSON.stringify(queue));
-  }
-
-  update_frame_items()
-  {
-    this.frame_items = document.querySelector("#FilteredItemsList_frame_details");
-    this.items = this.frame_items.contentWindow.document.querySelector("table");
-    this.process_items();
-  }
-
-/* Wrappers */
-  observer_wr(target, config, callback)
-  {
-    var observer = new MutationObserver(callback);
-    observer.observe(target, config);
-    observer.disconnect()
-  }
-
-  feature_wr(element, feature, listeners, position)
-  {
-    element = new DashboardMenuFeature(feature, listeners);
-    this.dashboard_menu.appendChild(element);
-  }
-
-/* Main Functions */
-  
+    
 // NEED TO WORK ON THIS
   init_UI()
   {
     var _self = this;
 
-    this.publish_queue.style.visibility="visible"
+    this.publish_queue.parentElement.style.display = "block";
 
     var right_clk = ()=>{
-      var evt = new MouseEvent("contextmenu", {bubbles:true});      
-      _self.items.querySelector("tr .col2[value='16']").dispatchEvent(evt);  //look for a component and dispatchEvent on it
+      let evt = new MouseEvent("contextmenu", {bubbles:true});
+      let element = _self.items.querySelector("tr .col2[value='16']");
+      if(!element)
+      {
+        alert("There is not support for these type of components yet");
+        return;
+      }
+      element.dispatchEvent(evt);
     }
+
     var mouse_clk = element =>{
       var evt = new MouseEvent("click", {
         bubbles: true,
@@ -318,7 +180,7 @@ new class Tridion_Ext
     var fill = function ()
     {
       var levels = [];
-      let matches = window.location.hash.match(/(\d+)-(\d+)-/);
+      let matches = window.location.hash.match(/(\w+)-(\w+-\w+)/);
       var curr_lvl = matches[1];
       var curr_folder = matches[2];
       var batch_id = _self.publish_queue_lvl_selector.options[_self.publish_queue_lvl_selector.selectedIndex].id;
@@ -349,7 +211,7 @@ new class Tridion_Ext
           localStorage.setItem('tdx_pending_actions', JSON.stringify(pending_actions));
           
           // navigate to current path but with valid level and folder to publish
-          var new_url = window.location.href.replace(/(\S+:)\d+(\S+)/, '$1'+levels[0]+'-'+_self.custom_queue_items[0].folder+ '-2');
+          var new_url = window.location.href.replace(/(\S+:)\d+(\S+)/, '$1'+levels[0]+'-'+_self.custom_queue_items[0].folder);
           window.location = new_url;
           window.location.reload();
         }
@@ -381,6 +243,138 @@ new class Tridion_Ext
       return true;
     };
   }
+  
+/* Actions*/
+  enable_publish_items()
+  {
+    var listeners = [];
+    var callback;
+
+    callback = ()=>
+    {
+      console.log("Publishing items");
+    }    
+    listeners.push({ "type": "click", "callback" : callback });
+    this.feature_wr(this.pro_publishing, features.publish_items, listeners);
+  }
+
+  add_to_custom_queue(item)
+  {
+    this.custom_queue_items.push(item);
+
+    let tr, name, type, last_mod;
+    tr = document.createElement("tr");
+    name = document.createElement("td");
+    type = document.createElement("td");
+    last_mod = document.createElement("td");
+
+    tr.id = item.id;
+    name.textContent = item.name;
+    type.textContent = item.type;
+    last_mod.textContent = item.last_mod;
+
+    tr.appendChild(name);
+    tr.appendChild(type);
+    tr.appendChild(last_mod);
+
+    this.publish_queue.querySelector("tbody").appendChild(tr);
+  }
+
+  enable_add_to_custom_queue()
+  {
+    var _self = this;
+    var listeners = [];
+    var callback;
+    callback = ()=>{
+      console.log("Add to custom queue");
+
+      var current_folder = window.location.hash.match(/\w+-(\w+-\w)/)[1];
+      _self.items.querySelectorAll(".selected")
+        .forEach( item => 
+        {
+          let item_details = 
+          {
+            'id': item.id,
+            'name': item.querySelector(".col1 > div").textContent,
+            'type': item.querySelector(".col2 > div").textContent,
+            'last_mod': item.querySelector(".col4 > div").textContent,
+            'folder' : current_folder
+          };
+          _self.add_to_custom_queue(item_details);
+        }
+      );
+    }
+    listeners.push({"type":"click", "callback": callback });
+    this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
+  }
+
+  enable_open_multiple_items()
+  {
+    var _self = this;
+    var listeners = [];
+    var callback;
+
+    callback = function()
+    {
+      _self.update_frame_items();              // quick fix for
+      if(_self.items.length == 0) return;
+      var selected_items = _self.items.querySelectorAll("tr.selected");
+      
+      selected_items
+        .forEach(function(item) 
+        {
+          if(item.type == 16)  // component
+          {
+            console.log("Opening", `${item.tcm_id} from lvl-id: ${item.lvl}`);
+            var url_base = `${document.location.origin}/WebUI/item.aspx?tcm=16#id=tcm:${item.lvl}-${item.tcm_id}`;
+            window.postMessage({action: "open_item", url: url_base}, "*");    // send a message to background to handle request
+          }
+          else        // everything else
+          {
+            console.error("Type not supported yet :P");
+          }
+        });
+      // Tridion does not support double click trigger on folder      
+    }
+    listeners.push({ "type": "click", "callback" : callback });
+    this.feature_wr(this.multiple_open, features.open_items, listeners);
+  }
+
+/* Storage */
+  get_localStorage()
+  {
+    window.postMessage({action: "get_publishable_batches"}, "*");
+  }
+  
+  backup_save()
+  {
+    // backup queue
+    var queue = { items: this.custom_queue_items };
+    localStorage.setItem('tdx_bk_queue', JSON.stringify(queue));
+  }
+
+  update_frame_items()
+  {
+    this.frame_items = document.querySelector("#FilteredItemsList_frame_details");
+    this.items = this.frame_items.contentWindow.document.querySelector("table");
+    this.process_items();
+  }
+
+/* Wrappers */
+  observer_wr(target, config, callback)
+  {
+    var observer = new MutationObserver(callback);
+    observer.observe(target, config);
+    // observer.disconnect();
+  }
+
+  feature_wr(element, feature, listeners, position)
+  {
+    element = new DashboardMenuFeature(feature, listeners);
+    this.dashboard_menu.appendChild(element);
+  }
+
+/* Main Functions */
 
   restore_backup()
   {
@@ -449,7 +443,7 @@ new class Tridion_Ext
     this.observer_wr(
       this.dashboard_list, 
       { subtree: true, childList: true}
-      ,() => {
+      ,function(){
         _self.list_items = document.querySelector("#FilteredItemsList_frame_details");
         if(_self.list_items != null)
         {

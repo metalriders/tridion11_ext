@@ -48,8 +48,7 @@ window.addEventListener("message", function(event) {
 
   switch(event.data.action){
     case "open_item" :
-    case "init_levels":
-      // chrome.runtime.sendMessage(event.data);
+      chrome.runtime.sendMessage(event.data);
       break;
     case "get_publishable_batches":
       get_publishable_batches();

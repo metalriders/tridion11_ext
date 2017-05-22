@@ -12,7 +12,7 @@ chrome.webNavigation.onCompleted.addListener(
 
     var details = {runAt: "document_end"};
     details["file"] = "js/popup.js";
-    chrome.tabs.executeScript( tab.tabId, details, msg_log("loaded tridion_ext"));
+    // chrome.tabs.executeScript( tab.tabId, details, msg_log("injected tridion_ext.js"));
   }
   // URL filter
   , {url:[{pathContains:"ListFilters/SearchListBar.aspx"}]}		
@@ -22,24 +22,28 @@ chrome.webNavigation.onCompleted.addListener(
  * Listen to load of levels to fill options page
  */
 chrome.webNavigation.onCompleted.addListener(
-  tab => chrome.tabs.sendMessage(tab.tabId, "init_levels")
-  , {url:[{pathContains:"SplashScreen/SplashScreen.aspx"}]}
+  tab => chrome.tabs.sendMessage(tab.tabId, "init_levels"),
+  {url:[{pathContains:"SplashScreen/SplashScreen.aspx"}]}
 );
 
-/*
- * Listen to load of levels to fill options page
- */
+// ALL REQUESTS
 chrome.webRequest.onCompleted.addListener(
   tab =>
   {
     // console.info("REQUEST-------------------------")
     // console.log("URL:", tab);
   },
+  {urls: ["<all_urls>"]}
+);
+
+// ALL NAVIGATION
+chrome.webNavigation.onCompleted.addListener(
+  tab =>
   {
-    urls: [
-        "<all_urls>"
-    ]
-  }
+    // console.info("NAVIGATION-------------------------")
+    // console.log("URL:", tab);
+  },
+  {urls: ["<all_urls>"]}
 );
 
 /*

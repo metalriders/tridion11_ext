@@ -180,7 +180,7 @@ customElements.define('option-section', OptionsSection);
             {
               var id = level.id;
               
-              if(this.checked)
+              if(level.checked)
               {
                 document.querySelectorAll("#custom-sections option-levels")
                   .forEach(levels =>
@@ -233,7 +233,7 @@ customElements.define('option-section', OptionsSection);
           
           // turn on selected items
           section.conf.forEach(
-            level => custom_batch.querySelector('[id="'+level+'"]').checked = true);
+            level => custom_batch.querySelector(`[id="${level}"]`).checked = true);
 
           custom_batches_container.appendChild(custom_batch);
         })
