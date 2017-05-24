@@ -1,3 +1,8 @@
+.ribbontoolbar .button.CustomQueue .image {
+    background-image: url(https://cdn1.iconfinder.com/data/icons/material-audio-video/22/queue-128.png);
+    background-size: contain;
+}
+
 .sp_main{
   width: 960px;
   height: 364px;
@@ -115,15 +120,15 @@
 
 .sp_main table{
   width:100%;
-  table-layout: fixed;
 }
 .tbl-header{
+  display: table-row;
   background-color: rgba(255,255,255,0.3);
 }
 .tbl-content{
   display: block;
   width: 959px;
-  height:320px;
+  height:319px;
   overflow-x:auto;
   margin-top: 0px;
   border: 1px solid rgba(255,255,255,0.3);
@@ -136,7 +141,8 @@
   color: #fff;
   text-transform: uppercase;
 }
-.sp_main td{1
+.sp_main td{
+  display: table-cell;
   padding: 9px;
   text-align: left;
   vertical-align:middle;
@@ -144,4 +150,24 @@
   font-size: 12px;
   color: #fff;
   border-bottom: solid 1px rgba(255,255,255,0.1);
+}
+
+.tbl-header tr th:nth-child(1){
+  width: 683px;
+}
+.tbl-header tr th:nth-child(2){
+  width: 178px;
+}
+.tbl-header tr th:nth-child(3){
+  width: 200px;
+}
+
+.tbl-content tr td:nth-child(1) {
+    width: 588px;
+}
+.tbl-content tr td:nth-child(2) {
+    width: 164px;
+}
+.tbl-content tr td:nth-child(3) {
+    width: 174px;
 }

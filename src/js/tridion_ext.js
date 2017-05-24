@@ -64,12 +64,13 @@ new class Tridion_Ext
 {  
   constructor()
   {
-    this._v = 0.3;
+    this._v = '0.0.8';
 
     // Context UI
     this.dashboard = document.querySelector(".dashboard");
     this.dashboard_menu = document.querySelector("#DashboardContextMenu");
     this.dashboard_list = document.querySelector("#FilteredDashboardList");
+    this.publish_group = document.querySelector("#PublishGroup");
     
     // Publish queue UI
     this.publish_queue = document.querySelector(".sp_main");
@@ -117,9 +118,7 @@ new class Tridion_Ext
   init_UI()
   {
     var _self = this;
-
-    this.publish_queue.parentElement.style.display = "block";
-
+        
     var right_clk = ()=>{
       let evt = new MouseEvent("contextmenu", {bubbles:true});
       let element = _self.items.querySelector("tr .col2[value='16']");
@@ -139,6 +138,23 @@ new class Tridion_Ext
       });
       element.dispatchEvent(evt);
     }
+
+    // Custom queue thumbnail    
+    let custom_queue_toggle = document.createElement("div");
+    custom_queue_toggle.id = "CustomQueueBtn";
+    custom_queue_toggle.className = "button CustomQueue ribbonitem";
+    custom_queue_toggle.title = "Toggle Custom Queue";
+    custom_queue_toggle.tabIndex = 1;
+    custom_queue_toggle.style["user-select"] = "none";
+    custom_queue_toggle.setAttribute("c:controltype", "Tridion.Controls.RibbonButton");
+    custom_queue_toggle.innerHTML = '<div class="image">&nbsp;</div><div class="text">Custom<br>Queue</div>';
+    document.querySelector("#PublishingQueueBtn").insertAdjacentElement(
+      'beforebegin', custom_queue_toggle
+    );
+    custom_queue_toggle.addEventListener(
+      'click',
+      () => this.publish_queue.parentElement.style.display = this.publish_queue.parentElement.style.display === "block"? "none":"block"
+    );
 
     // Multi selection
     var multiple_sel = (element, first_selection)=>{ 

@@ -1,53 +1,86 @@
 body{
-	background-color: #86c9f7;
-	margin: 0;
+  background-color: #86c9f7;
+  margin: 0;
 }
 
 #save{
-	position: fixed;
-	top: 14px;
-	right: 18px;
+  position: fixed;
+  top: 50%;
+  right: 10%;
 }
 .delete{
-	position: relative;
-	bottom: 41px;
-	left: 99%;
+  display: inline-block;
+  position: relative;
+  bottom: 10px;
+  left: 20px;
 }
+.edit {
+  display: inline-block;
+  position: relative;
+  right: 96.8%;
+  top: 3px;
+  height: 18px;
+  width: 18px;
+  background-size: cover;
+  background-image: url(https://cdn3.iconfinder.com/data/icons/wpzoom-developer-icon-set/500/85-128.png);
+  cursor: pointer;
+}
+.title_container{
+  width: 94%;
+  height: 25px;
+  display: inline-block;
+  border-bottom: 1px solid #a5a5a5;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0.2em;
+}
+.title_container input{
+  -webkit-margin-before: -12px;
+}
+.title_container h2::after{
+  /*content: " \2228";*/
+  /*content: url(https://cdn0.iconfinder.com/data/icons/navigation-set-arrows-part-one/32/ExpandMore-32.png);*/
+}
+
+.title_container h2 opened::after{
+  /*content: " \2227";*/
+  /*content: url(https://cdn0.iconfinder.com/data/icons/navigation-set-arrows-part-one/32/ExpandMore-32.png);*/
+}
+
 .options_section{
-	width: 75em;
-	margin: 30px auto;
+  width: 75em;
+  margin: 30px auto;
 }
 .options_section h3{
-	width: 90%;
-	margin: 30px 0 3px 0;
+  width: 90%;
+  margin: 30px 0 3px 0;
 }
 .add_custom{
-	float:left;
-	margin-right: 10px;
+  float:left;
+  margin-right: 10px;
 }
 option-section{
-	display: inline-block;
-	width: 90%;
-	background: rgba(255, 255, 255, 0.9);
-	box-shadow: 0px 1px 4px 0px rgba(85, 98, 112, 0.5);
-  padding: 1.5em 2em;;
+  display: inline-block;
+  width: 90%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0px 1px 4px 0px rgba(85, 98, 112, 0.5);
+  padding: 1.5em 3em;;
   margin: 10px auto;
 }
 option-section h2{
-	display: inherit;
-	width: 100%;
-	-webkit-margin-before: 0;
-	-webkit-margin-after: 0.6em;
+  display: inherit;
+  width: 94%;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0.6em;
 }
 
 option-levels{
-	display: inherit;
-	width: 100%;
+  display: inherit;
+  width: 100%;
 }
 
 option-level{
-	display: inherit;
+  display: inherit;
   float: left;
-	width: 50%;
-	padding: 3px 0px;
+  width: 50%;
+  padding: 3px 0px;
 }

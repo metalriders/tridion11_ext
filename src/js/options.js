@@ -63,27 +63,74 @@ class OptionsSection extends HTMLElement
   {
     super();
 
-    let title = document.createElement("h2");
+    var title_container = document.createElement("div");
+    title_container.className = "title_container";
+    
+    var title = document.createElement("h2");
     title.textContent = this.getAttribute("name") || name || "Custom batch";
-    this.append(title);
+    title_container.append(title);
+    this.append(title_container);
 
     if(custom) 
     {
       this.id = id? id : new Date().valueOf();
       this.custom = true;
       let selected_levels = {};
-
+      
+      title.addEventListener(
+        "dblclick",
+        ()=> console.log("double click!")
+      );
       document.querySelectorAll("#main-section input:checked")
         .forEach( (input) => selected_levels[input.value] = input.id);
+
+      let title_input = document.createElement("input");
+      title_container.appendChild(title_input);
+      title_input.style.display = "none";
+
+      title_input.addEventListener(
+        "keydown",
+        e =>
+        {
+          if(e.keyCode == 13)
+          {
+            title.textContent = title_input.value;
+            title_input.style.display = "none";
+          }
+        }
+      );
+
+      let edit = document.createElement("span");
+      edit.className = "edit";
+      edit.addEventListener(
+        "click", 
+        ()=>
+        {
+          title_input.style.display = "block";
+          title_input.value = title.textContent;
+          title.textContent = "";
+          title_input.focus();
+        }
+      );
 
       let del = document.createElement("button");
       del.className = "delete";
       del.textContent = "x";
-      del.addEventListener("click", () => this.parentNode.remove());
-
+      del.addEventListener(
+        "click",
+        () => 
+        {
+          if( confirm("Are you sure you want to delete this batch?"))
+            del.parentNode.remove();
+        }
+      );
       let opt_levels = new OptionLevels(selected_levels);
-      $(title).click( () => $(opt_levels).toggle());
+      $(title).click( () =>
+      {
+        $(opt_levels).toggle();
+      });
 
+      this.appendChild(edit);
       this.appendChild(del);
       this.appendChild(opt_levels);
     }
@@ -217,8 +264,7 @@ customElements.define('option-section', OptionsSection);
         all_levels_container.appendChild(levels);
         
         $(all_levels_container).find("h2").click( ()=> $(levels).toggle() );
-        // Purpose of this?
-        // $(all_levels_container).find("h2").click();
+        if(custom_batches) $(all_levels_container).find("h2").click();
         
         if(custom_batches == undefined){
           console.error("No custom batch found, create one first"); 
