@@ -60,7 +60,7 @@ class DashboardMenuFeature
  * Instant instantiation
  * @class Tridion_Ext
  */
-new class Tridion_Ext
+class Tridion_Ext
 {  
   constructor()
   {
@@ -558,3 +558,4 @@ new class Tridion_Ext
     }, false);
   }
 };
+window._TDX = new Tridion_Ext();
