@@ -10,12 +10,6 @@ var features =
     id: "add_to_cust_queue",
     class:"item Publish",
     title: "Push to Custom Queue"
-  },
-  publish_items:
-  {
-    id: "publihs_mult_items",
-    class:"item Publish disabled", 
-    title: "Publish from custom Queue"
   }
 };
 
@@ -261,19 +255,6 @@ class Tridion_Ext
   }
   
 /* Actions*/
-  enable_publish_items()
-  {
-    var listeners = [];
-    var callback;
-
-    callback = ()=>
-    {
-      console.log("Publishing items");
-    }    
-    listeners.push({ "type": "click", "callback" : callback });
-    this.feature_wr(this.pro_publishing, features.publish_items, listeners);
-  }
-
   add_to_custom_queue(item)
   {
     this.custom_queue_items.push(item);
@@ -445,8 +426,7 @@ class Tridion_Ext
     var sep = document.createElement("li");
     sep.className = "separator";
     this.dashboard_menu.appendChild(sep);
-
-    this.enable_publish_items();
+    
     this.enable_open_multiple_items();
     this.enable_add_to_custom_queue();
   }
