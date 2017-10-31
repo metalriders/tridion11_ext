@@ -99,6 +99,14 @@ class OptionsSection extends HTMLElement
           }
         }
       );
+      title_input.addEventListener(
+        "focusout",
+        e =>
+        {
+          title.textContent = title_input.value;
+          title_input.style.display = "none";
+        }
+      );
 
       let edit = document.createElement("span");
       edit.className = "edit";
@@ -109,6 +117,7 @@ class OptionsSection extends HTMLElement
           title_input.style.display = "block";
           title_input.value = title.textContent;
           title.textContent = "";
+          title_input.setSelectionRange(0, title_input.value.length);
           title_input.focus();
         }
       );
@@ -190,7 +199,7 @@ customElements.define('option-section', OptionsSection);
     chrome_storage_local
       .set(options, ()=>
       {
-        let status = document.getElementById('status');
+        let status = document.querySelector('#save-status .status-message');
         status.textContent = 'Options saved.';
         setTimeout( () => status.textContent = '', 750);
       });

@@ -63,7 +63,6 @@ window.addEventListener("message", function(event) {
  */
 function get_publishable_batches(){
   // Get all publishable batches
-  console.debug("getting publishable batches!");
   chrome_storage_local.get(null, storage =>{
     if(!storage.custom_batches) return;
 

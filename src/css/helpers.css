@@ -26,6 +26,7 @@
   font-size: 2em;
   color: #8b9999;
   padding-left: 10px;
+  cursor: pointer;
 }
 
 .batches-updated::after{
@@ -59,13 +60,14 @@
   min-width: 100px;
   padding: 5px 8px; 
   margin: 10px ;
+  cursor: pointer;
 }
 .sp_main input[type="button"]:hover, .sp_main input[type="button"]:active{
   color:#fff;
   background:#19a0c5;
 }
 .sp_batch_sel{
-  width: 331px;
+  width: 550px;
   float: left;
   margin: 10px;
 

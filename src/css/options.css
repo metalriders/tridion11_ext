@@ -1,23 +1,40 @@
 body{
-  background-color: #86c9f7;
-  margin: 0;
+  background: linear-gradient(#8fb7d2 , #a3add0);
+  margin: 0 10px;
 }
 
+#save-status{
+  width: 97%;
+  height: 20px;
+  padding: 10px 0;
+  position: fixed;
+  bottom: 0;
+  background: linear-gradient(#99d8b9 , #aeeead);
+  border: #271ca040 1px solid;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.status-message{
+  margin: 25px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #6f6f6f;
+}
 #save{
   position: fixed;
-  top: 50%;
-  right: 10%;
+  bottom: 11px;
+  right: 30px;
 }
 .delete{
   display: inline-block;
   position: relative;
-  bottom: 10px;
-  left: 20px;
+  bottom: 15px;
+  left: 54px;
 }
 .edit {
   display: inline-block;
   position: relative;
-  right: 96.8%;
+  right: 93%;
   top: 3px;
   height: 18px;
   width: 18px;
@@ -26,7 +43,7 @@ body{
   cursor: pointer;
 }
 .title_container{
-  width: 94%;
+  width: 90%;
   height: 25px;
   display: inline-block;
   border-bottom: 1px solid #a5a5a5;
@@ -47,24 +64,25 @@ body{
 }
 
 .options_section{
-  width: 75em;
+  width: 63em;
   margin: 30px auto;
+  padding-bottom: 20px;
 }
 .options_section h3{
-  width: 90%;
   margin: 30px 0 3px 0;
 }
 .add_custom{
   float:left;
   margin-right: 10px;
 }
+
 option-section{
   display: inline-block;
-  width: 90%;
+  width: 85%;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0px 1px 4px 0px rgba(85, 98, 112, 0.5);
   padding: 1.5em 3em;;
-  margin: 10px auto;
+  margin: 10px 20px;
 }
 option-section h2{
   display: inherit;
@@ -82,5 +100,5 @@ option-level{
   display: inherit;
   float: left;
   width: 50%;
-  padding: 3px 0px;
+  padding: 5px 0px;
 }
