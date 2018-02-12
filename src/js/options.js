@@ -25,10 +25,10 @@ class OptionLevel extends HTMLElement
   {
     super();
     
-    let checkbox = document.createElement("input");
-    let span = document.createElement("span");
+    let checkbox = document.createElement('input');
+    let span = document.createElement('span');
 
-    checkbox.type = "checkbox";
+    checkbox.type = 'checkbox';
     checkbox.id = level.id;
     checkbox.value = level.name;
     checkbox.checked = checked;
@@ -63,11 +63,11 @@ class OptionsSection extends HTMLElement
   {
     super();
 
-    var title_container = document.createElement("div");
-    title_container.className = "title_container";
+    var title_container = document.createElement('div');
+    title_container.className = 'title_container';
     
-    var title = document.createElement("h2");
-    title.textContent = this.getAttribute("name") || name || "Custom batch";
+    var title = document.createElement('h2');
+    title.textContent = this.getAttribute('name') || name || 'Custom batch';
     title_container.append(title);
     this.append(title_container);
 
@@ -78,58 +78,53 @@ class OptionsSection extends HTMLElement
       let selected_levels = {};
       
       title.addEventListener(
-        "dblclick",
-        ()=> console.log("double click!")
+        'dblclick', ()=> console.log('double click!')
       );
-      document.querySelectorAll("#main-section input:checked")
+      document.querySelectorAll('#main-section input:checked')
         .forEach( (input) => selected_levels[input.value] = input.id);
 
-      let title_input = document.createElement("input");
+      let title_input = document.createElement('input');
       title_container.appendChild(title_input);
-      title_input.style.display = "none";
+      title_input.style.display = 'none';
 
       title_input.addEventListener(
-        "keydown",
-        e =>
+        'keydown', e =>
         {
           if(e.keyCode == 13)
           {
             title.textContent = title_input.value;
-            title_input.style.display = "none";
+            title_input.style.display = 'none';
           }
         }
       );
       title_input.addEventListener(
-        "focusout",
-        e =>
+        'focusout', e =>
         {
           title.textContent = title_input.value;
-          title_input.style.display = "none";
+          title_input.style.display = 'none';
         }
       );
 
-      let edit = document.createElement("span");
-      edit.className = "edit";
+      let edit = document.createElement('span');
+      edit.className = 'edit';
       edit.addEventListener(
-        "click", 
-        ()=>
+        'click', ()=>
         {
-          title_input.style.display = "block";
+          title_input.style.display = 'block';
           title_input.value = title.textContent;
-          title.textContent = "";
+          title.textContent = '';
           title_input.setSelectionRange(0, title_input.value.length);
           title_input.focus();
         }
       );
 
-      let del = document.createElement("button");
-      del.className = "delete";
-      del.textContent = "x";
+      let del = document.createElement('button');
+      del.className = 'delete';
+      del.textContent = 'x';
       del.addEventListener(
-        "click",
-        () => 
+        'click', () => 
         {
-          if( confirm("Are you sure you want to delete this batch?"))
+          if( confirm('Are you sure you want to delete this batch?'))
             del.parentNode.remove();
         }
       );
@@ -150,41 +145,53 @@ customElements.define('option-section', OptionsSection);
 
 (function(){
 
-  var main_levels;
-  var main_conf;
-  var custom_batches;
+  var main_levels, main_conf, custom_batches, customs;
+  
+  customs = document.querySelector('#custom-sections');
 
   /**
-   * Save options to chrome local storage.
-   * This will save your selected main batch levels and update custom batches.
+   *  Set selected options
+   *  This will setup options from a selected source file (not saved to storage)
    */
-  function save_options() {    
+  function set_options(options){
+    main_levels = options.main_batch.levels;
+    main_conf = options.main_batch.conf;
+    custom_batches = options.custom_batches;
+    
+    render_options();
+  }
+
+  /**
+   *  Get selected options
+   *  This generates an object with current selected options (not from storage)
+   */
+  function get_options(){
     var options = {
-      "main_batch":{
-        "levels" : main_levels, 
-        "conf":{}
+      'main_batch':{
+        'levels' : main_levels, 
+        'conf':{}
       },
-      "custom_batches": []
+      'custom_batches': []
     };
 
     // Get main_batch changes
-    document.querySelectorAll("#main-section input:checked")
+    document.querySelectorAll('#main-section input:checked')
       .forEach( (item) => options.main_batch.conf[item.value] = true );
 
     // Get custom batches
-    document.querySelectorAll("#custom-sections option-section")
+    document.querySelectorAll('#custom-sections option-section')
       .forEach( section =>
       {
         var publishable = true;
         var section_conf = 
         {
-          "id": section.id,
-          "name": section.querySelector("h2").textContent,
-          "conf": [],
-          "publishable": true
+          'id': section.id,
+          'name': section.querySelector('h2').textContent,
+          'conf': [],
+          'publishable': true
         };
 
-        section.querySelectorAll("input:checked")
+        section.querySelectorAll('input:checked')
           .forEach( item =>
           {
             if(!item.value.match(/17/) && publishable) publishable = !publishable;
@@ -195,7 +202,16 @@ customElements.define('option-section', OptionsSection);
         options.custom_batches.push(section_conf);
       });
 
-    // Set new options and let user know options were saved.
+    return options;
+  }
+
+  /**
+   * Save options to chrome local storage.
+   * This will save your selected main batch levels and update custom batches.
+   */
+  function save_options() {    
+    let options = get_options();
+
     chrome_storage_local
       .set(options, ()=>
       {
@@ -205,100 +221,156 @@ customElements.define('option-section', OptionsSection);
       });
   }
 
-  var customs = document.querySelector("#custom-sections");
-  // Load personal settings
-  chrome_storage_local
-    .get( null, 
-      conf => 
-      {
-        if(conf.main_batch == undefined || conf.main_batch.levels == undefined) 
-        { 
-          alert("No main batch found, run tridion first"); 
-          return; 
+  /**
+   * Export options to local file.
+   * This will generate a file of current configuration of main levels and custom batches
+   */
+  function export_options(){
+    let options = get_options();
+
+    $('<a/>', {
+      'download': 'TridionOptions.json',
+      'href' : 'data:application/json,' + encodeURIComponent(JSON.stringify(options))
+    }).appendTo('body')
+    .click(function() {
+       $(this).remove()
+    })[0].click()
+  }
+
+  /**
+   * Import options.
+   * This will generate a file of current configuration of main levels and custom batches
+   */
+  function import_options(){
+    $('#importFile')
+      .click()
+      .change(function(e){
+
+        if(e.target.files.length == 0) return;
+        let file = e.target.files[0];
+
+        let reader = new FileReader();
+        reader.onload = function(event){
+          set_options(JSON.parse(event.target.result));
         }
-      
-        console.log("loading levels");
-        main_levels = conf.main_batch.levels;
-        main_conf = conf.main_batch.conf;
-        custom_batches = conf.custom_batches;
-      
-        
-        let all_levels_container = document.querySelector("option-section");
-        var levels = new OptionLevels(main_levels);
+        reader.readAsText(file);
+        $(this).val('');
+      })
+  }
   
-        // Load Main batch
-        levels.querySelectorAll("input")
-          .forEach( level => 
+  /**
+   * Render Main levels
+   */
+  function render_main_batch(){
+    let all_levels_container = document.querySelector('option-section');
+    var levels = new OptionLevels(main_levels);
+  
+    levels.querySelectorAll('input')
+      .forEach( level => {
+        if(main_conf != undefined) level.checked = main_conf[level.value];
+  
+        level.addEventListener('change', ()=> {
+          var id = level.id;
+          
+          if(level.checked)
           {
-            if(main_conf != undefined) level.checked = main_conf[level.value];
-
-            level.addEventListener("change", ()=> 
-            {
-              var id = level.id;
-              
-              if(level.checked)
+            document.querySelectorAll('#custom-sections option-levels')
+              .forEach( levels =>
               {
-                document.querySelectorAll("#custom-sections option-levels")
-                  .forEach(levels =>
+                let added = false;
+                levels.querySelectorAll('input')
+                  .forEach( section_level =>
                   {
-                    let added = false;
-                    levels.querySelectorAll("input")
-                      .forEach( section_level =>
-                      {
-                        if(section_level.value > level.value && !added){
-                          section_level
-                            .parentNode
-                            .insertAdjacentElement(
-                              'beforebegin', 
-                              new OptionLevel({id:level.id, name:level.value})
-                            );
-                          added = true;
-                        }
-                      });
-
-                      if(!added) 
-                        levels
-                          .appendChild( 
-                            new OptionLevel({id:level.id, name:level.value})
-                          );
-                  });
+                    if(section_level.value > level.value && !added){
+                      section_level.parentNode
+                        .insertAdjacentElement('beforebegin', new OptionLevel({ id:level.id, name:level.value }) );
+                      added = true;
+                    }
+                  }
+                );
+  
+                if(!added) 
+                  levels.appendChild( new OptionLevel({ id:level.id, name:level.value }) );
               }
-              else
-                document.querySelectorAll(`#custom-sections input[id="${level.id}"]`)
-                  .forEach( input => input.parentNode.remove() );
-            });
+            );
           }
-          ,this);
-          
-        all_levels_container.appendChild(levels);
-        
-        $(all_levels_container).find("h2").click( ()=> $(levels).toggle() );
-        if(custom_batches) $(all_levels_container).find("h2").click();
-        
-        if(custom_batches == undefined){
-          console.error("No custom batch found, create one first"); 
-          return; 
-        }
+          else 
+          {
+            document.querySelectorAll(`#custom-sections input[id="${level.id}"]`)
+              .forEach( input => input.parentNode.remove() );
+          }
+        });
+      }
+      , this);
+      
+    all_levels_container.appendChild(levels);    
+    if(custom_batches) $(all_levels_container).find('h2').click();
+  }
 
-        // Load custom batches
-        let custom_batches_container = document.querySelector("#custom-sections");
-        custom_batches.forEach(section =>
-        {
-          var custom_batch = new OptionsSection(section.name, true, section.id);
-          
-          // turn on selected items
-          section.conf.forEach(
-            level => custom_batch.querySelector(`[id="${level}"]`).checked = true);
+  /**
+   * Render custom batches
+   */
+  function render_custom_batches(){
+    let custom_batches_container = document.querySelector('#custom-sections');
+    
+    if(custom_batches == undefined)
+    {
+      console.error('No custom batch found, create one first'); 
+      return; 
+    }
 
-          custom_batches_container.appendChild(custom_batch);
-        })
-     });
+    custom_batches.forEach(section =>
+    {
+      var custom_batch = new OptionsSection(section.name, true, section.id);
+      section.conf.forEach(level => custom_batch.querySelector(`[id="${level}"]`).checked = true);
+      custom_batches_container.appendChild(custom_batch);
+    })
+  }
+  
+  /**
+   * Render all options
+   */
+  function render_options(){
+    $('#main-section').find('option-levels').remove();
+    $('#custom-sections').find('option-section').remove();
 
-  document.querySelector(".add_custom")
-    .addEventListener(
-      "click",
-      () => customs.appendChild(new OptionsSection("New Batch", true))
+    render_main_batch();
+    render_custom_batches();
+  }
+
+  /**
+   * Set up listeners
+   */
+  function set_listeners(){
+    let all_levels_container = document.querySelector('option-section');
+
+    $(all_levels_container).find('h2').click( 
+      () => $(all_levels_container).find('option-levels').toggle()
     );
 
-  document.querySelector("#save").addEventListener("click", save_options);
+    document.querySelector('.add_custom').addEventListener('click',
+      () => customs.appendChild(new OptionsSection('New Batch', true))
+    );
+
+    document.querySelector('#save').addEventListener('click', save_options);
+    document.querySelector('#export').addEventListener('click', export_options);
+    document.querySelector('#import').addEventListener('click', import_options);
+  }
+
+  // Load settings
+  chrome_storage_local.get( null, 
+    conf => 
+    {
+      if(conf.main_batch == undefined || conf.main_batch.levels == undefined) 
+      { 
+        alert('No main batch found, run tridion first'); 
+        return; 
+      }
+    
+      console.debug('Init settings');
+      set_options(conf);
+    }
+  );
+  
+  set_listeners();
 })();
