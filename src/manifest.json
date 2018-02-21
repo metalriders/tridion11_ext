@@ -2,7 +2,7 @@
   "name": "Tridion11 extension",
   "short_name": "trid11_ext",
   "description": "This tool will help web editors to ease usage of tridion 2011",
-  "version": "0.0.8",
+  "version": "0.1.1",
 
   "permissions": [
     "webNavigation",
@@ -33,7 +33,7 @@
       "js":["js/sup_publishing.js"]
     },
     {
-      "matches":["*://*/*"],
+      "matches":["*://epocms.www8.hp.com/*"],
       "js":["js/popup.js"]
     }
   ],

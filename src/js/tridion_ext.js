@@ -13,6 +13,14 @@ var features =
   }
 };
 
+const ITEM_TYPE_FOLDER = 2;
+const ITEM_TYPE_PINK_FOLDER = 4;
+const ITEM_TYPE_WEBPAGE = 64;
+const ITEM_TYPE_COMPONENT = 16;
+
+/**
+ * @class DashBoardMenuFeature
+ */
 class DashboardMenuFeature
 {
   constructor(feature, listeners)
@@ -33,12 +41,10 @@ class DashboardMenuFeature
     this.element.appendChild(element_span);
     
     this.element.addEventListener(
-      "mouseover",
-      ()=> Tridion.Controls.ContextMenu.prototype._hightlightItem(this.element)
+      "mouseover", ()=> Tridion.Controls.ContextMenu.prototype._hightlightItem(this.element)
     );
     this.element.addEventListener(
-      "click",
-      ()=> this.element.parentElement.style.visibility = "hidden"
+      "click", ()=> this.element.parentElement.style.visibility = "hidden"
     );
 
     listeners.forEach(
@@ -58,33 +64,34 @@ class Tridion_Ext
 {  
   constructor()
   {
-    this._v = '0.0.8';
+    this._v = '0.1.1';
 
     // Context UI
-    this.dashboard = document.querySelector(".dashboard");
-    this.dashboard_menu = document.querySelector("#DashboardContextMenu");
-    this.dashboard_list = document.querySelector("#FilteredDashboardList");
-    this.publish_group = document.querySelector("#PublishGroup");
+    this.dashboard = document.querySelector('.dashboard');
+    this.dashboard_levels_iframe = document.querySelector('#DashboardTree iframe').contentWindow.document;
+    this.dashboard_menu = document.querySelector('#DashboardContextMenu');
+    this.dashboard_list = document.querySelector('#FilteredDashboardList');
+    this.publish_group = document.querySelector('#PublishGroup');
     
     // Publish queue UI
-    this.publish_queue = document.querySelector(".sp_main");
-    this.publish_queue_items = this.publish_queue.querySelector("tbody");
-    this.publish_queue_publish_btn = this.publish_queue.querySelector("#td11_publish_all");
-    this.publish_queue_unpublish_btn = this.publish_queue.querySelector("#td11_unpublish_all");
-    this.publish_queue_clear_btn = this.publish_queue.querySelector("#td11_clear_all");
-    this.publish_queue_lvl_selector = this.publish_queue.querySelector(".sp_batch_sel select");
+    this.publish_queue = document.querySelector('.sp_main');
+    this.publish_queue_items = this.publish_queue.querySelector('tbody');
+    this.publish_queue_publish_btn = this.publish_queue.querySelector('#td11_publish_all');
+    this.publish_queue_unpublish_btn = this.publish_queue.querySelector('#td11_unpublish_all');
+    this.publish_queue_clear_btn = this.publish_queue.querySelector('#td11_clear_all');
+    this.publish_queue_lvl_selector = this.publish_queue.querySelector('.sp_batch_sel select');
 
     // Controls
-    this.publish_btn = this.dashboard_menu.querySelector("#cm_pub_publish");
-    this.unpublish_btn = this.dashboard_menu.querySelector("#cm_pub_unpublish");
+    this.publish_btn = this.dashboard_menu.querySelector('#cm_pub_publish');
+    this.unpublish_btn = this.dashboard_menu.querySelector('#cm_pub_unpublish');
 
     // Structures   *need to work on these*
     this.sup_publishing;
     this.custom_queue_items = [];
     this.publications_refs = [];
     this.publishable_batches = [];
-    this.list_levels = [];
-    this.list_items = [];
+    this.levels_list = [];
+    this.items_list = [];
     this.items = [];
     this.levels = {};
 
@@ -301,7 +308,7 @@ class Tridion_Ext
         }
       );
     }
-    listeners.push({"type":"click", "callback": callback });
+    listeners.push( {"type":"click", "callback": callback } );
     this.feature_wr(this.add_to_queue, features.custom_queue, listeners);
   }
 
@@ -320,7 +327,7 @@ class Tridion_Ext
       selected_items
         .forEach(function(item) 
         {
-          if(item.type == 16)  // component
+          if(item.type == ITEM_TYPE_COMPONENT || item.type == ITEM_TYPE_WEBPAGE)  // component
           {
             console.log("Opening", `${item.tcm_id} from lvl-id: ${item.lvl}`);
             var url_base = `${document.location.origin}/WebUI/item.aspx?tcm=16#id=tcm:${item.lvl}-${item.tcm_id}`;
@@ -440,10 +447,10 @@ class Tridion_Ext
       this.dashboard_list, 
       { subtree: true, childList: true}
       ,function(){
-        _self.list_items = document.querySelector("#FilteredItemsList_frame_details");
-        if(_self.list_items != null)
+        _self.items_list = document.querySelector("#FilteredItemsList_frame_details");
+        if(_self.items_list != null)
         {
-          _self.list_items.addEventListener("load",function() 
+          _self.items_list.addEventListener("load",function() 
           {
             if(this.contentWindow.document.body.innerText == "") return;
             _self.update_frame_items();
@@ -455,6 +462,18 @@ class Tridion_Ext
       }
     );
 
+    // Observer for loading on item list
+    this.observer_wr(
+      this.dashboard_levels_iframe, 
+      { subtree: true, childList: true}
+      ,function(e){
+        let m_record = e[0];
+        console.log('LOADED LEVELS', m_record);
+        if(m_record.addedNodes < 2) return;
+        window.postMessage({action: "init_levels"}, "*");
+        this.disconnect();
+      }
+    );
 
     // Backup
     window.addEventListener("hashchange", e =>_self.backup_save());
@@ -500,7 +519,6 @@ class Tridion_Ext
     return out;
   }
 
-
   /**
    *  Add publishable custom batches to selector
    */
@@ -531,6 +549,10 @@ class Tridion_Ext
         case "publishable_batches":
           this.publishable_batches = event.data.data;
           this.update_publishable_batches();
+          break;
+        case 'set_levels':
+          this.levels = event.data.data;
+          console.log(this.levels);
           break;
         default:
           break;

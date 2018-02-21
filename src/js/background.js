@@ -15,15 +15,7 @@ chrome.webNavigation.onCompleted.addListener(
     // chrome.tabs.executeScript( tab.tabId, details, msg_log("injected tridion_ext.js"));
   }
   // URL filter
-  , {url:[{pathContains:"ListFilters/SearchListBar.aspx"}]}		
-);
-
-/*
- * Listen to load of levels to fill options page
- */
-chrome.webNavigation.onCompleted.addListener(
-  tab => chrome.tabs.sendMessage(tab.tabId, "init_levels"),
-  {url:[{pathContains:"SplashScreen/SplashScreen.aspx"}]}
+  , {url: [{pathContains: "ListFilters/SearchListBar.aspx"}] }
 );
 
 // ALL REQUESTS
@@ -31,9 +23,9 @@ chrome.webRequest.onCompleted.addListener(
   tab =>
   {
     // console.info("REQUEST-------------------------")
-    // console.log("URL:", tab);
+    // console.log("URL:", tab.url, tab);
   },
-  {urls: ["<all_urls>"]}
+  {urls: ["<all_urls>"], types:['xmlhttprequest']}
 );
 
 // ALL NAVIGATION
@@ -41,7 +33,7 @@ chrome.webNavigation.onCompleted.addListener(
   tab =>
   {
     // console.info("NAVIGATION-------------------------")
-    // console.log("URL:", tab);
+    // console.log("URL:", tab.url, tab);
   },
   {urls: ["<all_urls>"]}
 );
@@ -62,11 +54,10 @@ chrome.browserAction.onClicked.addListener(function(tab) {
  */
 chrome.runtime.onMessage.addListener(function(msg)
 {
-  console.debug("Background - Yo I got a message!");
-  console.info(msg);
+  console.debug("Background MSG - ", msg);
 
   switch (msg.action) {
-    case 'init_levels':
+    case 'init_levels_storage':
       chrome.storage.local.get("main_batch", obj =>{
         if(obj.main_batch == undefined){
           var json = {
@@ -77,10 +68,10 @@ chrome.runtime.onMessage.addListener(function(msg)
           };
 
           chrome.storage.local.set(json, () => {
-            console.log('Settings saved');
+            console.debug('Settings saved');
           });
         }
-        console.log("Levels already defined");
+        console.info("Levels already defined");
       })
       break;
     case 'open_item':

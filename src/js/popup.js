@@ -7,29 +7,11 @@ var chrome_storage = chrome.storage;
 var chrome_storage_local = chrome_storage.local;
 var chrome_storage_sync = chrome_storage.sync;
 
-// Reserved for communications
+// Reserved for communications from bkg
 chrome.runtime.onMessage.addListener(function(msg)
 {
+  console.debug('POPUP MSG from BKG - ', msg);
   switch(msg){
-    case "init_levels":
-      let dashboard = document.querySelector("#DashboardTree iframe");
-      let publications_ref = dashboard.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
-      var levels = {};
-      
-      console.log("Getting levels first time");
-
-      publications_ref.forEach(
-        publication_el => 
-        {
-          var id = publication_el.id.split(':')[1].split('-')[1];
-          var level = publication_el.querySelector(".header .title").title;
-          level = level.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
-          levels[unescape(level)] = id;
-        });
-
-      console.log("List of formated levels", levels);
-      chrome.runtime.sendMessage({action: "init_levels", data: levels});
-      break;
     default: break;
   }
 });
@@ -41,6 +23,7 @@ scr.type="text/javascript";
 scr.src= chrome.extension.getURL('js/tridion_ext.js');
 document.head.appendChild(scr);
 
+// Reserved for communications from tridion page
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves
   if (event.source != window)
@@ -49,6 +32,27 @@ window.addEventListener("message", function(event) {
   switch(event.data.action){
     case "open_item" :
       chrome.runtime.sendMessage(event.data);
+      break;
+    case "init_levels":
+      let dashboard = document.querySelector("#DashboardTree iframe");
+      let publications_ref = dashboard.contentDocument.querySelectorAll("div.rootNode.populated > div.children.visible > div.node");
+      var levels = {};
+      
+      // console.log("Getting levels");
+      publications_ref.forEach(
+        publication_el => 
+        {
+          var id = publication_el.id.split(':')[1].split('-')[1];
+          var level = publication_el.querySelector(".header .title").title;
+          level = level.replace(/ \(tcm.*\)/g, "");  // lvl   remove what is between parenthesis
+          levels[unescape(level)] = id;
+        });
+
+      // console.log("List of formated levels", levels);
+      // Set levels in storage
+      chrome.runtime.sendMessage({action: "init_levels_storage", data: levels});
+      // Set levels in TridionExt instance
+      window.postMessage({"action":"set_levels", "data": levels},"*");
       break;
     case "get_publishable_batches":
       get_publishable_batches();

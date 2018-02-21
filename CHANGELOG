@@ -1,12 +1,38 @@
 All notable changes to this project will be documented in this file.
+Released v 0.1.1 - Feb 21, 2018
+- Fixed open multiple items Feature
+- Minor bugs fixed
 
-Released v0.0.1 - March 17, 2017
-  - [Feature] Added open multiple items 
+Released v 0.1.0 - Feb 17, 2018
+- Minor bugs fixed
+- Added import/export for batches
+
+Released v 0.0.9 - Oct 31, 2017
+- improved design
+
+Released v 0.0.8 - May 24, 2017
+- Added refresh and close button to custom queue
+
+Dev v 0.0.7 - March 17, 2017
+- Improved layout for custom queue
+
+Dev v 0.0.6 - March 17, 2017
+- Add editing for custom batches and improved interface
+
+Dev v 0.0.5 - March 17, 2017
+- Add custom queue toggler in home toolbar
+
+Released v 0.0.4 - May 22, 2017
+- support for custom queue publisher
+- minor fixes
+
+Dev v0.0.3 - TBD
+  - [Bug] Fixed wrong lvl id setup for localized and root items
+  - [Bug] Removed red change on page when clicking extension button
+  - [Feature] Options page to manage levels and create batches
 
 Released v0.0.2 - March 19, 2017
   - [Bug] Fixed retrieve of level name
 
-WIP v0.0.3 - TBD
-  - [Bug] Fixed wrong lvl id setup for localized and root items
-  - [Bug] Removed red change on page when clicking extension button
-  - [Feature] Options page to manage levels and create batches
+Released v0.0.1 - March 17, 2017
+  - [Feature] Added open multiple items 
