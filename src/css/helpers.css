@@ -138,13 +138,13 @@
   color: rgba(0,0,0,.4);
 }
 
-::-webkit-scrollbar {
+.sp_main::-webkit-scrollbar {
     width: 6px;
 } 
-::-webkit-scrollbar-track {
+.sp_main::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
 } 
-::-webkit-scrollbar-thumb {
+.sp_main::-webkit-scrollbar-thumb {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
 }
 
