@@ -16,12 +16,19 @@ chrome.runtime.onMessage.addListener(function(msg)
   }
 });
 
-// Inject tridion_ext into page
-console.log("Injecting tridion extension");
-var scr = document.createElement('script');
-scr.type="text/javascript";
-scr.src= chrome.extension.getURL('js/tridion_ext.js');
-document.head.appendChild(scr);
+function injectElement(element, type, source){
+  console.log("Injecting %s : %s", type, source);
+  let el = document.createElement(element);
+  el.type = type;
+  el.src = source;
+  document.head.appendChild(el);
+}
+
+// inject scripts
+injectElement('script', 'text/javascript', chrome.extension.getURL('js/utils.js'));
+injectElement('script', 'text/javascript', chrome.extension.getURL('js/modules/dashboard_classes.js'));
+injectElement('script', 'text/javascript', chrome.extension.getURL('js/modules/custom_queue.js'));
+setTimeout( () => injectElement('script', 'text/javascript', chrome.extension.getURL('js/tridion_ext.js')), 5000);
 
 // Reserved for communications from tridion page
 window.addEventListener("message", function(event) {

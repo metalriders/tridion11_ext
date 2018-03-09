@@ -1,4 +1,10 @@
 All notable changes to this project will be documented in this file.
+
+Dev v 0.1.2 - March 7, 2018
+- Added more stability
+- Selective deletion for items in custom queue
+- Filter invalid items pushed to custom queue
+
 Released v 0.1.1 - Feb 21, 2018
 - Fixed open multiple items Feature
 - Minor bugs fixed
